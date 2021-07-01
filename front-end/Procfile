@@ -1,0 +1,3 @@
+cd front-end/
+npm run install
+web: react-scripts start
