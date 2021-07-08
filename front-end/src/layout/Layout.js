@@ -1,6 +1,6 @@
 import React from 'react';
 import Menu from './menu/Menu';
-import Routes from './menu/Routes';
+import Routes from './Routes';
 
 import './Layout.css';
 
@@ -20,6 +20,9 @@ function Layout() {
           <Routes />
         </div>
       </div>
+      <footer className=' bg-warning'>
+        {/* &#169;LilyVox 2021 */}
+      </footer>
     </div>
   );
 }
