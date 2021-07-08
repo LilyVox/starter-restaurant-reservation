@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
+    "migrate:refresh":"npx knex migrate:rollback && npx knex migrate:latest",
     "start:dev": "nodemon src/server.js",
     "test": "npx cross-env LOG_LEVEL=warn jest --runInBand --detectOpenHandles --forceExit",
     "test:1": "npm run test -- us-01",
