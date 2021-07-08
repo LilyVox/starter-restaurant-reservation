@@ -10,7 +10,6 @@ async function list(req, res) {
 }
 /**
  * List handler for a specific date
- *
  */
 async function listByDate(req, res) {
   const theDate = req.query.date;
@@ -19,10 +18,7 @@ async function listByDate(req, res) {
   console.trace('service returns: ' + data);
   res.status(200).json(data);
 }
-/**
- * @name reservations-controller
- * list()
- */
+
 module.exports = {
   list: asyncErrorHandler(list),
   listByDate: asyncErrorHandler(listByDate),
