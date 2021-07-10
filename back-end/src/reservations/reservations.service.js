@@ -10,8 +10,8 @@ function list() {
   return Knex(tableName).select('*');
 }
 
-function listByDate(date) {
-  return Knex(tableName).select('*').where({ reservation_date: date });
+function listByDate(reservation_date) {
+  return Knex(tableName).select('*').where('reservation_date', reservation_date);
 }
 module.exports = {
   create,
