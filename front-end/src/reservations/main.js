@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import NewReservationForm from './NewReservationForm';
 import sendNewReservation from './reservationService';
 
@@ -7,6 +8,7 @@ import sendNewReservation from './reservationService';
  * @returns the reservation moderation screen.
  */
 function ReservationMain() {
+  const history = useHistory(); 
   const submitHandler = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
@@ -16,14 +18,17 @@ function ReservationMain() {
       mobile_number: data.get('mobile_number'),
       reservation_time: data.get('reservation_time'),
       reservation_date: data.get('reservation_date'),
-    }
-    console.trace('sent FormData: ', reqObject);
+    };
     sendNewReservation(reqObject);
+  };
+  const cancelHandler = (e) => {
+    history.goBack();
   };
   return (
     <main className='container-fluid'>
       <h1 className='my-0'>Create Reservation</h1>
       <NewReservationForm submitHandler={submitHandler} />
+      <button className='btn' value='cancel' onClick={cancelHandler} />
     </main>
   );
 }
