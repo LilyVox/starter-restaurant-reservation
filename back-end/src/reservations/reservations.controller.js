@@ -16,24 +16,122 @@ function verifyDateFormat(req, res, next) {
     next();
   }
 }
+
+function verifyDate(req, res, next) {
+  const reservation = res.locals.reservation;
+  const reservationDate = new Date(
+    `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
+  );
+  const today = new Date();
+
+  if (reservationDate.getDay() === 2) {
+    return next({
+      status: 400,
+      message: "'reservation_date' field: restaurant is closed on tuesday",
+    });
+  }
+
+  if (reservationDate < today) {
+    return next({
+      status: 400,
+      message: "'reservation_date' and 'reservation_time' field must be in the future",
+    });
+  }
+
+  if (
+    reservationDate.getHours() < 10 ||
+    (reservationDate.getHours() === 10 && reservationDate.getMinutes() < 30)
+  ) {
+    return next({
+      status: 400,
+      message: "'reservation_time' field: restaurant is not open until 10:30AM",
+    });
+  }
+
+  if (
+    reservationDate.getHours() > 22 ||
+    (reservationDate.getHours() === 22 && reservationDate.getMinutes() >= 30)
+  ) {
+    return next({
+      status: 400,
+      message: "'reservation_time' field: restaurant is closed after 10:30PM",
+    });
+  }
+
+  if (
+    reservationDate.getHours() > 21 ||
+    (reservationDate.getHours() === 21 && reservationDate.getMinutes() > 30)
+  ) {
+    return next({
+      status: 400,
+      message:
+        "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)",
+    });
+  }
+  res.locals.date = reservationDate;
+  next();
+}
+function verifyCapturedData(req, res, next) {
+  let { data } = req.body;
+  if (!data) return next({ status: 400, message: 'Body must include a data object' });
+  const neededFields = [
+    'first_name',
+    'last_name',
+    'mobile_number',
+    'reservation_time',
+    'reservation_date',
+  ];
+  for (let field of neededFields) {
+    if (!data.hasOwnProperty(field) || data[field] === '') {
+      return next({ status: 400, message: `Field required: ${field}` });
+    }
+  }
+  let testDate = Date.parse(`${data.reservation_date} ${data.reservation_time}`);
+  if (Number.isNaN(testDate)) {
+    return next({
+      status: 400,
+      message: 'reservation_date or reservation_time field is in an incorrect format',
+    });
+  }
+  if (typeof data.people !== 'number')
+    return next({ status: 400, message: 'people field must be a number' });
+  if (data.people < 1) return next({ status: 400, message: 'people field must be at least 1' });
+  res.locals.reservation = data;
+  next();
+}
+
 async function list(req, res, next) {
-  if (res.locals.date) next();
+  if (req.query?.date) next();
   else {
     const data = await service.list();
-    res.json(data);
+    res.status(200).json(data);
   }
+  return;
 }
 /**
  * List handler for a specific date
- * is called in @list() if a query is found
+ *
+ * is in the pipeline after list()
  */
 async function listByDate(req, res) {
   const theDate = res.locals.date;
   console.info('res.locals.date in listByDate: ' + theDate);
   const data = await service.listByDate(theDate);
+  console.info('data to send: ' + data);
   res.status(200).json(data);
+  return;
+}
+/**
+ * Posts to DB a new reservation
+ * after field verification
+ */
+async function createReservation(req, res) {
+  const returning = await service.create(res.locals.reservation);
+  console.info(returning);
+  res.status(201).json(returning);
 }
 
 module.exports = {
-  list: [verifyDateFormat, asyncErrorHandler(list), asyncErrorHandler(listByDate)],
+  list: [asyncErrorHandler(list), verifyDateFormat, asyncErrorHandler(listByDate)],
+  create:[verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
 };

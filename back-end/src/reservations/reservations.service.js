@@ -3,7 +3,7 @@ const Knex = require('../db/connection');
 const tableName = 'reservations';
 
 function create(aNewReservation) {
-  return Knex(tableName).insert(aNewReservation);
+  return Knex(tableName).insert(aNewReservation).returning('*');
 }
 
 function list() {
