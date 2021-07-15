@@ -32,6 +32,7 @@ function ReservationMain() {
     if (thing.error) {
       setReservationsError(thing);
       console.log(reservationsError);
+      history.go(0);
     }
   };
   const cancelHandler = (e) => {
