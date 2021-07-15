@@ -128,7 +128,7 @@ async function listByDate(req, res) {
 async function createReservation(req, res) {
   const returning = await service.create(res.locals.reservation);
   console.info(returning);
-  res.status(201).json({data: returning});
+  res.status(201).json({data: returning[0]});
 }
 
 module.exports = {
