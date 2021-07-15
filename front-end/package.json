@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build": "react-scripts build",
+    "commit": "git add . && git commit",
     "eject": "react-scripts eject",
     "start": "react-scripts start",
     "test": "npx cross-env CI=true npm run test:run",

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import NewReservationForm from './NewReservationForm';
 import sendNewReservation from './reservationService';
 
@@ -8,8 +9,10 @@ import sendNewReservation from './reservationService';
  * @returns the reservation moderation screen.
  */
 function ReservationMain() {
-  const history = useHistory(); 
-  const submitHandler = (e) => {
+  const [reservationsError, setReservationsError] = useState(null);
+
+  const history = useHistory();
+  const submitHandler = async (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
     const reqObject = {
@@ -18,17 +21,30 @@ function ReservationMain() {
       mobile_number: data.get('mobile_number'),
       reservation_time: data.get('reservation_time'),
       reservation_date: data.get('reservation_date'),
+      people: parseInt(data.get('people'))
     };
-    sendNewReservation(reqObject);
+    let thing = await sendNewReservation(reqObject).then((response) => {
+      if (response.ok) {
+        history.push(`/dashboard?date=${data.get('reservation_date')}`);
+      }
+      return response.json();
+    });
+    if (thing.error) {
+      setReservationsError(thing);
+      console.log(reservationsError);
+    }
   };
   const cancelHandler = (e) => {
     history.goBack();
   };
   return (
-    <main className='container-fluid'>
+    <main className='container-fluid justify-content-center'>
       <h1 className='my-0'>Create Reservation</h1>
+      <ErrorAlert error={reservationsError} />
       <NewReservationForm submitHandler={submitHandler} />
-      <button className='btn' value='cancel' onClick={cancelHandler} />
+      <button className='btn btn-primary' onClick={cancelHandler}>
+        Cancel
+      </button>
     </main>
   );
 }
