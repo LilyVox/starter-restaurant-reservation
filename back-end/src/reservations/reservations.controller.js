@@ -104,7 +104,7 @@ async function list(req, res, next) {
   if (req.query?.date) next();
   else {
     const data = await service.list();
-    res.status(200).json(data);
+    res.status(200).json({data});
   }
   return;
 }
@@ -118,7 +118,7 @@ async function listByDate(req, res) {
   console.info('res.locals.date in listByDate: ' + theDate);
   const data = await service.listByDate(theDate);
   console.info('data to send: ' + data);
-  res.status(200).json(data);
+  res.status(200).json({data});
   return;
 }
 /**
@@ -128,7 +128,7 @@ async function listByDate(req, res) {
 async function createReservation(req, res) {
   const returning = await service.create(res.locals.reservation);
   console.info(returning);
-  res.status(201).json(returning);
+  res.status(201).json({data: returning});
 }
 
 module.exports = {
