@@ -23,14 +23,14 @@ function ReservationMain() {
       reservation_date: data.get('reservation_date'),
       people: parseInt(data.get('people'))
     };
-    let thing = await sendNewReservation(reqObject).then((response) => {
+    let reply = await sendNewReservation(reqObject).then((response) => {
       if (response.ok) {
         history.push(`/dashboard?date=${data.get('reservation_date')}`);
       }
       return response.json();
     });
-    if (thing.error) {
-      setReservationsError(thing);
+    if (reply.error) {
+      setReservationsError(reply);
       console.log(reservationsError);
       history.go(0);
     }
