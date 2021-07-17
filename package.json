@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "npm -prefix front-end run build",
-    "predeploy": "git add . && git commit",
+    "commit": "git add . && git commit",
     "deploy": "git push origin development",
     "preinstall": "cd ./back-end && npm install",
     "install": "cd ./front-end && npm install",
