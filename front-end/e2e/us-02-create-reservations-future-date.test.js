@@ -35,7 +35,7 @@ describe("US-02 - Create reservation on a future, working date - E2E", () => {
     beforeEach(async () => {
       await page.type("input[name=first_name]", "John");
       await page.type("input[name=last_name]", "Doe");
-      await page.type("input[name=mobile_number]", "1234567890");
+      await page.type("input[name=mobile_number]", "123-456-7890");
       await page.type("input[name=people]", "3");
     });
 
