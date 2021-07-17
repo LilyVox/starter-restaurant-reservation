@@ -99,7 +99,6 @@ function ReservationMain() {
   function formatPhoneNum(phoneNum) {
     if (phoneNum.match(/[0-9]{3}-[0-9]{3}-[0-9]{4}/)) return phoneNum;
     if (phoneNum.match(/\d{9}/)) return phoneNum.replace(/(\d{3})-?(\d{3})-?(\d{4})/, '$1-$2-$3');
-    return phoneNum;
   }
   let errDisplay =
     reservationsError.length > 0
