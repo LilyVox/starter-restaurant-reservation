@@ -24,11 +24,11 @@ function ReservationMain() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    let validToSend = await checkFields().then((errors)=>{
+    let validToSend = await checkFields().then((errors) => {
       if (errors.length > 0) return false;
       return true;
-    })
-    if(validToSend){
+    });
+    if (validToSend) {
       await sendNewReservation(reservation).then((response) => {
         if (response.ok) {
           history.push(`/dashboard?date=${reservation.reservation_date}`);
@@ -76,19 +76,31 @@ function ReservationMain() {
         "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)"
       );
     }
-    if (errors.length > 0) setReservationsError([...errors])
-    else setReservationsError([])
+    if (errors.length > 0) setReservationsError([...errors]);
+    else setReservationsError([]);
     return errors;
   }
-  function changeHandler({ target }) {
+  const changeHandler = ({ target }) => {
+    let keyName = target.name;
+    let value =
+      keyName === 'people'
+        ? Number(target.value)
+        : keyName === 'mobile_number'
+        ? formatPhoneNum(target.value)
+        : target.value;
     setReservation({
       ...reservation,
-      [target.name]: target.name === 'people' ? Number(target.value) : target.value,
+      [keyName]: value,
     });
-  }
+  };
   const cancelHandler = () => {
     history.goBack();
   };
+  function formatPhoneNum(phoneNum) {
+    if (phoneNum.match(/[0-9]{3}-[0-9]{3}-[0-9]{4}/)) return phoneNum;
+    if (phoneNum.match(/\d{9}/)) return phoneNum.replace(/(\d{3})-?(\d{3})-?(\d{4})/, '$1-$2-$3');
+    return phoneNum;
+  }
   let errDisplay =
     reservationsError.length > 0
       ? reservationsError.map((error, index) => <ErrorAlert key={index} error={{ error: error }} />)
