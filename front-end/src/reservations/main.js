@@ -1,48 +1,103 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import NewReservationForm from './NewReservationForm';
 import sendNewReservation from './reservationService';
 
+const reservationObject = {
+  first_name: '',
+  last_name: '',
+  mobile_number: '',
+  reservation_time: '',
+  reservation_date: '',
+  people: 0,
+};
 /**
  *
  * @returns the reservation moderation screen.
  */
 function ReservationMain() {
-  const [reservationsError, setReservationsError] = useState(null);
-
+  const [reservation, setReservation] = useState(reservationObject);
+  const [reservationsError, setReservationsError] = useState([]);
   const history = useHistory();
+  let errors = [];
+
   const submitHandler = async (e) => {
     e.preventDefault();
-    const data = new FormData(e.target);
-    const reqObject = {
-      first_name: data.get('first_name'),
-      last_name: data.get('last_name'),
-      mobile_number: data.get('mobile_number'),
-      reservation_time: data.get('reservation_time'),
-      reservation_date: data.get('reservation_date'),
-      people: parseInt(data.get('people'))
-    };
-    let reply = await sendNewReservation(reqObject).then((response) => {
-      if (response.ok) {
-        history.push(`/dashboard?date=${data.get('reservation_date')}`);
-      }
-      return response.json();
-    });
-    if (reply.error) {
-      setReservationsError(reply);
-      console.log(reservationsError);
-      history.go(0);
+    let validToSend = await checkFields().then((errors)=>{
+      if (errors.length > 0) return false;
+      return true;
+    })
+    if(validToSend){
+      await sendNewReservation(reservation).then((response) => {
+        if (response.ok) {
+          history.push(`/dashboard?date=${reservation.reservation_date}`);
+          return response.json();
+        }
+      });
     }
   };
-  const cancelHandler = (e) => {
+  /**
+   * Validates the date to make sure it's reasonable
+   */
+  async function checkFields() {
+    const reservationDate = new Date(
+      `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
+    );
+    const today = new Date();
+
+    if (reservationDate.getDay() === 2) {
+      errors.push("'reservation_date' field: restaurant is closed on tuesday");
+    }
+
+    if (reservationDate < today) {
+      errors.push("'reservation_date' and 'reservation_time' field must be in the future");
+    }
+
+    if (
+      reservationDate.getHours() < 10 ||
+      (reservationDate.getHours() === 10 && reservationDate.getMinutes() < 30)
+    ) {
+      errors.push("'reservation_time' field: restaurant is not open until 10:30AM");
+    }
+
+    if (
+      reservationDate.getHours() > 22 ||
+      (reservationDate.getHours() === 22 && reservationDate.getMinutes() >= 30)
+    ) {
+      errors.push("'reservation_time' field: restaurant is closed after 10:30PM");
+    }
+
+    if (
+      reservationDate.getHours() > 21 ||
+      (reservationDate.getHours() === 21 && reservationDate.getMinutes() > 30)
+    ) {
+      errors.push(
+        "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)"
+      );
+    }
+    if (errors.length > 0) setReservationsError([...errors])
+    else setReservationsError([])
+    return errors;
+  }
+  function changeHandler({ target }) {
+    setReservation({
+      ...reservation,
+      [target.name]: target.name === 'people' ? Number(target.value) : target.value,
+    });
+  }
+  const cancelHandler = () => {
     history.goBack();
   };
+  let errDisplay =
+    reservationsError.length > 0
+      ? reservationsError.map((error, index) => <ErrorAlert key={index} error={{ error: error }} />)
+      : null;
   return (
     <main className='container-fluid justify-content-center'>
       <h1 className='my-0'>Create Reservation</h1>
-      <ErrorAlert error={reservationsError} />
-      <NewReservationForm submitHandler={submitHandler} />
+      {errDisplay}
+      <NewReservationForm submitHandler={submitHandler} changeHandler={changeHandler} />
       <button className='btn btn-primary' onClick={cancelHandler}>
         Cancel
       </button>

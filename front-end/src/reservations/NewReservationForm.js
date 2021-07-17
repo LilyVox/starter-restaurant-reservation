@@ -1,8 +1,8 @@
 import React from 'react';
 
-function NewReservationForm({ submitHandler }) {
+function NewReservationForm({ submitHandler, changeHandler }) {
   return (
-    <form onSubmit={submitHandler} className='' name='new_reservation'>
+    <form onSubmit={submitHandler}onChange={changeHandler} className='' name='new_reservation'>
       <div className='row-auto'>
         <div className='col-auto'>
           <label className='form-label' htmlFor='first_name'>
@@ -49,7 +49,7 @@ function NewReservationForm({ submitHandler }) {
         </div>
       </div>
       <div className='row m-4'>
-        <input type='submit' value='Submit Reservation' />
+        <button type='submit' className='btn btn-warning'>Submit Reservation</button>
       </div>
     </form>
   );
