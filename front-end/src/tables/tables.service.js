@@ -5,23 +5,41 @@ const headers = new Headers();
 headers.append('Content-Type', 'application/json');
 
 export async function sendNewTable(data) {
-  let body = JSON.stringify({data});
+  let body = JSON.stringify({ data });
   const request = {
     method: 'POST',
     headers,
     body,
-  }; 
-  console.info(body);
+  };
+  console.info('making new table: ' + body);
   return await fetch(`${API_BASE_URL}/tables/`, request);
 }
-// export async function seatNewTable(data) {
-//   let body = JSON.stringify({data});
-//   const request = {
-//     method: 'POST',
-//     headers,
-//     body,
-//   }; 
-//   console.info(body);
-//   return await fetch(`${API_BASE_URL}/tables/`, request);
-// }
+
+export async function seatTable(data) {
+  let body = JSON.stringify({ data });
+  const request = {
+    method: 'POST',
+    headers,
+    body,
+  };
+  console.info('seating table: ' + body);
+  return await fetch(`${API_BASE_URL}/tables/`, request);
+}
+export async function loadTables(signal) {
+  const request = {
+    method: 'GET',
+    headers,
+    signal
+  };
+  return await fetch(`${API_BASE_URL}/tables/`, request);
+}
+
+export async function loadReservation(reservation_id, signal) {
+  const request = {
+    method: 'GET',
+    headers,
+    signal
+  };
+  return await fetch(`${API_BASE_URL}/reservations/${reservation_id}`, request);
+}
 

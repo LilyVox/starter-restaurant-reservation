@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from 'react-router-dom';
 import { listReservations } from '../utils/api';
-import { previous, today, next } from "../utils/date-time";
+import { previous, today, next } from '../utils/date-time';
+import ReservationDisplay from '../layout/subComponents/ReservationDisplay';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 
 /**
@@ -14,6 +15,7 @@ function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const history = useHistory();
+  const { reservation_id } = useParams();
 
   useEffect(loadDashboard, [date]);
 
@@ -27,17 +29,31 @@ function Dashboard({ date }) {
   }
 
   return (
-    <main>
-      <h1>Dashboard</h1>
-      <div className='d-md-flex mb-3'>
-        <h4 className='mb-0'>Reservations for {date}</h4>
+    <main className='px-2'>
+      <h1 className='m-1'>Dashboard</h1>
+      <div className='mb-3'>
+        <h4 className=''>Reservations for {date}</h4>
       </div>
       <ErrorAlert error={reservationsError} />
-      {JSON.stringify(reservations)} 
-      {/* make this data prettier */}
-      <button className='btn btn-dark' type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous Day</button>
-			<button className='btn btn-dark' type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
-			<button className='btn btn-dark' type="button" onClick={() => history.push(`/dashboard?date=${next(date)}`)}>Next Day</button>
+      <ReservationDisplay reservations={reservations} />
+      <button
+        className='btn btn-dark'
+        type='button'
+        onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>
+        Previous Day
+      </button>
+      <button
+        className='btn btn-dark'
+        type='button'
+        onClick={() => history.push(`/dashboard?date=${today()}`)}>
+        Today
+      </button>
+      <button
+        className='btn btn-dark'
+        type='button'
+        onClick={() => history.push(`/dashboard?date=${next(date)}`)}>
+        Next Day
+      </button>
     </main>
   );
 }
