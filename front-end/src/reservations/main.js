@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import NewReservationForm from './NewReservationForm';
-import sendNewReservation from './reservationService';
+import sendNewReservation from './reservation.service';
 
 const reservationObject = {
   first_name: '',

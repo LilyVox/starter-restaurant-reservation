@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
-import {sendNewTable} from './tables.service';
-import NewTable from './NewTable';
+import { sendNewTable } from './tables.service';
+import TableForm from './TableForm';
 
 const tableObject = {
   table_name: '',
@@ -10,9 +10,9 @@ const tableObject = {
 };
 /**
  *
- * @returns the reservation moderation screen.
+ * @returns the table creation and update page
  */
-function TableMain() {
+function TableCUMain() {
   const [table, setTable] = useState(tableObject);
   const [tablesError, setTablesError] = useState([]);
   const history = useHistory();
@@ -33,11 +33,11 @@ function TableMain() {
     }
   };
   /**
-   * Validates the table info 
+   * Validates the table info
    */
   async function checkFields() {
-    if(table.table_name.length < 2) errors.push('table_name must be at least 2 characters long')
-    if(table.capacity < 1) errors.push('capacity must be greater than 0')
+    if (table.table_name.length < 2) errors.push('table_name must be at least 2 characters long');
+    if (table.capacity < 1) errors.push('capacity must be greater than 0');
     if (errors.length > 0) setTablesError([...errors]);
     else setTablesError([]);
     return errors;
@@ -59,7 +59,7 @@ function TableMain() {
     <main className='container-fluid justify-content-center'>
       <h1 className='my-0'>Create a new Table</h1>
       {errDisplay}
-      <NewTable submitHandler={submitHandler} changeHandler={changeHandler} />
+      <TableForm submitHandler={submitHandler} changeHandler={changeHandler} />
       <button className='btn btn-primary' onClick={cancelHandler}>
         Cancel
       </button>
@@ -67,4 +67,4 @@ function TableMain() {
   );
 }
 
-export default TableMain;
+export default TableCUMain;

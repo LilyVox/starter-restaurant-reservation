@@ -15,15 +15,15 @@ export async function sendNewTable(data) {
   return await fetch(`${API_BASE_URL}/tables/`, request);
 }
 
-export async function seatTable(data) {
+export async function seatTable(data, table_id) {
   let body = JSON.stringify({ data });
   const request = {
-    method: 'POST',
+    method: 'PUT',
     headers,
     body,
   };
   console.info('seating table: ' + body);
-  return await fetch(`${API_BASE_URL}/tables/`, request);
+  return await fetch(`${API_BASE_URL}/tables/${table_id}/seat`, request);
 }
 export async function loadTables(signal) {
   const request = {
@@ -34,12 +34,4 @@ export async function loadTables(signal) {
   return await fetch(`${API_BASE_URL}/tables/`, request);
 }
 
-export async function loadReservation(reservation_id, signal) {
-  const request = {
-    method: 'GET',
-    headers,
-    signal
-  };
-  return await fetch(`${API_BASE_URL}/reservations/${reservation_id}`, request);
-}
 

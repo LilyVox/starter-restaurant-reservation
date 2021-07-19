@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NewTable = ({ changeHandler, submitHandler }) => {
+const TableForm = ({ changeHandler, submitHandler }) => {
   return (
     <div className='container'>
       <form
@@ -24,4 +24,4 @@ const NewTable = ({ changeHandler, submitHandler }) => {
   );
 };
 
-export default NewTable;
+export default TableForm;

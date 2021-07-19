@@ -3,9 +3,8 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Dashboard from '../dashboard/Dashboard';
 import NotFound from './subComponents/NotFound';
-import SeatReservation from '../tables/SeatReservation';
 import ReservationPage from '../reservations/main';
-import TableMain from '../tables/main';
+import TableCUMain from '../tables/main';
 import { today } from '../utils/date-time';
 import useQuery from '../utils/useQuery';
 
@@ -26,17 +25,14 @@ function Routes() {
       <Route exact={true} path='/reservations/new'>
         <ReservationPage />
       </Route>
-      <Route exact={true} path='/reservations/:reservation_id/seat'>
-        <SeatReservation />
-      </Route>
-      <Route exact={true} path='/reservations/:reservation_id'>
-        <Redirect to={'/dashboard'} />
-      </Route>
       <Route exact={true} path='/reservations'>
         <Redirect to={'/dashboard'} />
       </Route>
+      <Route path='/reservations/:reservation_id'>
+        <Redirect to={'/dashboard'} />
+      </Route>
       <Route exact={true} path='/tables/new'>
-        <TableMain />
+        <TableCUMain />
       </Route>
       <Route path='/dashboard'>
         <Dashboard date={date ? date : today()} />
