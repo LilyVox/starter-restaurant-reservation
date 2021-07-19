@@ -1,9 +1,6 @@
 const service = require('./reservations.service');
 const asyncErrorHandler = require('../errors/asyncErrorHandler');
-/**
- * List handler for reservation resources
- * @returns a list of reservations to the client
- */
+
 function verifyDateFormat(req, res, next) {
   if (req.query?.date) {
     let { date } = req.query;
@@ -100,11 +97,15 @@ function verifyCapturedData(req, res, next) {
   next();
 }
 
+/**
+ * List handler for reservation resources
+ * @returns a list of reservations to the client
+ */
 async function list(req, res, next) {
   if (req.query?.date) next();
   else {
     const data = await service.list();
-    res.status(200).json({data});
+    res.status(200).json({ data });
   }
   return;
 }
@@ -115,10 +116,8 @@ async function list(req, res, next) {
  */
 async function listByDate(req, res) {
   const theDate = res.locals.date;
-  console.info('res.locals.date in listByDate: ' + theDate);
   const data = await service.listByDate(theDate);
-  console.info('data to send: ' + data);
-  res.status(200).json({data});
+  res.status(200).json({ data });
   return;
 }
 /**
@@ -127,11 +126,10 @@ async function listByDate(req, res) {
  */
 async function createReservation(req, res) {
   const returning = await service.create(res.locals.reservation);
-  console.info(returning);
-  res.status(201).json({data: returning[0]});
+  res.status(201).json({ data: returning[0] });
 }
 
 module.exports = {
   list: [asyncErrorHandler(list), verifyDateFormat, asyncErrorHandler(listByDate)],
-  create:[verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
+  create: [verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
 };
