@@ -8,7 +8,9 @@ function list() {
 function create(aNewTable) {
   return Knex(tableName).insert(aNewTable).returning('*');
 }
-
+function read(table_id){
+  return Knex(tableName).select('*').where('table_id', table_id).first();
+}
 /**
  * 
  * @param {integer} table_id the table to seat
@@ -23,6 +25,7 @@ function unseatTable(table_id){
 }
 module.exports = {
   create,
+  read,
   list,
   update,
   delete: unseatTable,

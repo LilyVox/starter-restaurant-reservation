@@ -17,15 +17,21 @@ function verifyTableData(req, res, next) {
   next();
 }
 
-function preSeating(req, res, next) {
+async function preSeating(req, res, next) {
   const { table_id } = req.params;
   const { data } = req.body;
+  if (!res.locals.reservation) return next({ status: 400, message: 'reservation not merged' });
   if (!table_id) return next({ status: 400, message: 'no table id?' });
   if (!data) return next({ status: 400, message: 'Body must include a data object' });
-  if (!data.reservation_id)
-    return next({ status: 400, message: 'data must include a reservation_id' });
+  let theTable = await service.read(table_id);
+  if (res.locals.reservation.people >= theTable.capacity) {
+    return next({
+      status: 400,
+      message: `Table ${theTable.table_name} cannot seat ${res.locals.reservation.people}`,
+    });
+  }
   res.locals.reservation_id = data.reservation_id;
-  res.locals.table_id = table_id;
+  res.locals.table = theTable;
   next();
 }
 async function cleanUp(req, res, next) {
@@ -67,8 +73,8 @@ async function createTable(req, res) {
  * Seats a table with a provided reservation
  */
 async function seatTable(req, res) {
-  const { reservation_id, table_id } = res.locals;
-  const data = await service.update(table_id, reservation_id);
+  const { reservation_id, table } = res.locals;
+  const data = await service.update(table.table_id, reservation_id);
   return res.status(200).json({ data });
 }
 async function unseatTable(req, res) {
@@ -76,10 +82,16 @@ async function unseatTable(req, res) {
   let data = await service.delete(table_id);
   return res.sendStatus(204);
 }
+async function readTable(req, res) {
+  const table_id = Number(req.params.table_id);
+  let data = await service.read(table_id);
+  return res.status(200).json({ data });
+}
 
 module.exports = {
   list: [asyncErrorHandler(list)],
   create: [verifyTableData, asyncErrorHandler(createTable)],
   update: [preSeating, asyncErrorHandler(seatTable)],
   delete: [asyncErrorHandler(cleanUp), asyncErrorHandler(unseatTable)],
+  read: [asyncErrorHandler(readTable)]
 };

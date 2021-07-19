@@ -96,6 +96,17 @@ function verifyCapturedData(req, res, next) {
   res.locals.reservation = data;
   next();
 }
+async function isValidID(req, res, next) {
+  let reservation_id = Number(req.params.reservation_id);
+  if (!reservation_id) {
+    reservation_id = req.body.data?.reservation_id;
+    if (!reservation_id) return next({ status: 400, message: 'Reservation not found by express' });
+  }
+  let reservation = await service.read(reservation_id);
+  if (!reservation) return next({ status: 400, message: 'Reservation not found in database' });
+  res.locals.reservation = reservation[0];
+  next();
+}
 
 /**
  * List handler for reservation resources
@@ -108,6 +119,10 @@ async function list(req, res, next) {
     res.status(200).json({ data });
   }
   return;
+}
+
+function read(req, res) {
+  res.status(200).json({ data: res.locals.reservation });
 }
 /**
  * List handler for a specific date
@@ -132,4 +147,6 @@ async function createReservation(req, res) {
 module.exports = {
   list: [asyncErrorHandler(list), verifyDateFormat, asyncErrorHandler(listByDate)],
   create: [verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
+  read: [asyncErrorHandler(isValidID), read],
+  isValidID,
 };
