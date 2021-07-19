@@ -39,10 +39,16 @@ function Dashboard({ date }) {
       setReservationsError(null);
     };
   }
-  const finishHandler = async (table_id) => {
-    if (window.confirm('Is this table ready to seat new guests? This cannot be undone.')) {
-      await unseatTable(table_id).catch(setTablesError);
-      history.push('/reservations');
+  const finishHandler = (table_id) => {
+    let timeToFinish = window.confirm('Is this table ready to seat new guests? This cannot be undone.');
+    if (timeToFinish) {
+      unseatTable(table_id)
+        .then((response) => {
+          if (response.ok) {
+            history.push('/tables');
+          }
+        })
+        .catch(setTablesError);
     }
   };
 

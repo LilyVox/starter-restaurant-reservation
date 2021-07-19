@@ -11,7 +11,6 @@ export async function sendNewTable(data) {
     headers,
     body,
   };
-  console.info('making new table: ' + body);
   return await fetch(`${API_BASE_URL}/tables/`, request);
 }
 

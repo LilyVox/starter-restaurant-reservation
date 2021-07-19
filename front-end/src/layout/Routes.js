@@ -35,6 +35,9 @@ function Routes() {
       <Route exact={true} path='/tables/new'>
         <TableCUMain />
       </Route>
+      <Route exact={true} path='/tables'>
+        <Redirect to={'/dashboard'} />
+      </Route>
       <Route path='/dashboard'>
         <Dashboard date={date ? date : today()} />
       </Route>

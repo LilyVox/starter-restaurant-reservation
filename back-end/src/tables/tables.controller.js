@@ -14,7 +14,9 @@ function verifyTableData(req, res, next) {
     return next({ status: 400, message: 'capacity field must be a number' });
   if (data.capacity < 1) return next({ status: 400, message: 'capacity field must be at least 1' });
   if(data.table_name.length < 2) return next({status:400, message:'table_name must be 2 or more characters'})
-  res.locals.table = { table_name: data.table_name, capacity: data.capacity, status: 'free' };
+  let status = data.reservation_id? 'occupied': 'free';
+  res.locals.table = { ...data, status: status };
+  
   next();
 }
 async function verifyTableId(req, res, next){
@@ -45,18 +47,9 @@ async function preSeating(req, res, next) {
   next();
 }
 async function cleanUp(req, res, next) {
-  const table_id = Number(req.params.table_id);
-  if (!table_id) return next({ status: 400, message: 'no table to clean up' });
-  let tables = await service.list();
-  let table = tables.filter((aTable) => aTable.table_id === table_id)[0];
-  console.log(table);
-  if (!table) {
-    return next({ status: 400, message: 'Table not found' });
+  if (res.locals.table.status !== 'occupied') {
+    return next({ status: 400, message: 'Table is not occupied' });
   }
-  if (table.status !== 'occupied') {
-    return next({ status: 400, message: 'Table isnt occupied' });
-  }
-  res.locals.table_id = table_id;
   next();
 }
 
@@ -75,6 +68,7 @@ async function list(req, res, next) {
  * after field verification
  */
 async function createTable(req, res) {
+  console.log(res.locals.table)
   const returning = await service.create(res.locals.table);
   res.status(201).json({ data: returning[0] });
 }
@@ -89,8 +83,8 @@ async function seatTable(req, res) {
 }
 async function unseatTable(req, res) {
   const { table_id } = res.locals;
-  let data = await service.delete(table_id);
-  return res.sendStatus(204);
+  await service.delete(table_id);
+  return res.sendStatus(200);
 }
 async function readTable(req, res) {
   return res.status(200).json({ data: res.locals.table });
@@ -100,6 +94,6 @@ module.exports = {
   list: [asyncErrorHandler(list)],
   create: [verifyTableData, asyncErrorHandler(createTable)],
   update: [preSeating, asyncErrorHandler(seatTable)],
-  delete: [asyncErrorHandler(cleanUp), asyncErrorHandler(unseatTable)],
+  delete: [verifyTableId, asyncErrorHandler(cleanUp), asyncErrorHandler(unseatTable)],
   read: [verifyTableId, asyncErrorHandler(readTable)]
 };

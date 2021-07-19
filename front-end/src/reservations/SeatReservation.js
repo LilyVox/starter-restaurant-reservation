@@ -25,7 +25,7 @@ const SeatReservation = () => {
     };
   }, [reservation_id]);
 
-  const seatHandler = async (e) => {
+  const seatHandler = async () => {
     let theTable = tables.find(table=> Number(table.table_id) === Number(tablePicked))
     if(theTable.capacity > reservation.people){
       await seatTable(reservation_id, theTable.table_id).catch(setTablesError);
