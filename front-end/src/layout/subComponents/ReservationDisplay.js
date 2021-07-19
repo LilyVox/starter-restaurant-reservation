@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ReservationDisplay = ({ reservations }) => {
-  let reservationList = reservations.map((res) => {
+  let reservationList = reservations.map((res, index) => {
     return (
-      <div className='card flex-4 text-center bg-transparent m-2 shadow' style={{ width: '20EM' }}>
+      <div className='card flex-4 text-center bg-transparent m-2 shadow' style={{ width: '20EM' }} key={index}>
         <div className='card-header'>{`Reservation for ${res.people}`}</div>
         <div className='card-body'>{`${res.first_name}, ${res.last_name}`}</div>
         <div className='card-footer'>{`${res.reservation_time}`}</div>

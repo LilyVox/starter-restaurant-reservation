@@ -15,7 +15,8 @@ export async function sendNewTable(data) {
   return await fetch(`${API_BASE_URL}/tables/`, request);
 }
 
-export async function seatTable(data, table_id) {
+export async function seatTable(reservation_id, table_id) {
+  let data = { reservation_id };
   let body = JSON.stringify({ data });
   const request = {
     method: 'PUT',
@@ -40,8 +41,8 @@ export async function loadTables(signal) {
     signal,
   };
   return await fetch(`${API_BASE_URL}/tables/`, request)
-  .then((response)=>response.json())
-  .then((response)=> response.data);
+    .then((response) => response.json())
+    .then((response) => response.data);
 }
 
 export default loadTables;

@@ -19,6 +19,8 @@ export async function loadReservation(reservation_id, signal) {
     headers,
     signal,
   };
-  return await fetch(`${API_BASE_URL}/reservations/${reservation_id}`, request);
+  return await fetch(`${API_BASE_URL}/reservations/${reservation_id}`, request)
+  .then((response)=> response.json())
+  .then((response)=> response.data);;
 }
 export default sendNewReservation;
