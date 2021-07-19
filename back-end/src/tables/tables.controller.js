@@ -13,21 +13,31 @@ function verifyTableData(req, res, next) {
   if (typeof data.capacity !== 'number')
     return next({ status: 400, message: 'capacity field must be a number' });
   if (data.capacity < 1) return next({ status: 400, message: 'capacity field must be at least 1' });
-  res.locals.table = { table_name: data.table_name, capacity: data.capacity, status: free };
+  if(data.table_name.length < 2) return next({status:400, message:'table_name must be 2 or more characters'})
+  res.locals.table = { table_name: data.table_name, capacity: data.capacity, status: 'free' };
   next();
 }
-
+async function verifyTableId(req, res, next){
+  const table_id = Number(req.params.table_id);
+  if(!table_id || Number.isNaN(table_id)) return next({status:400, message:'Missing table ID'})
+  res.locals.table_id = table_id;
+  let data = await service.read(res.locals.table_id);
+  if(!data) return next({status:404, message:`table ${table_id} not found`})
+  res.locals.table = data;
+  next();
+}
 async function preSeating(req, res, next) {
   const { table_id } = req.params;
   const { data } = req.body;
-  if (!res.locals.reservation) return next({ status: 400, message: 'reservation not merged' });
+  if (!res.locals.reservation) return next({ status: 404, message: `reservation ${res.locals.reservation_id} not found` });
   if (!table_id) return next({ status: 400, message: 'no table id?' });
   if (!data) return next({ status: 400, message: 'Body must include a data object' });
   let theTable = await service.read(table_id);
-  if (res.locals.reservation.people >= theTable.capacity) {
+  if(theTable.status !== 'free') return next({status:400, message:'table is occupied'})
+  if (res.locals.reservation.people > theTable.capacity) {
     return next({
       status: 400,
-      message: `Table ${theTable.table_name} cannot seat ${res.locals.reservation.people}`,
+      message: `Table ${theTable.table_name} has insufficient capacity for ${res.locals.reservation.people} people`,
     });
   }
   res.locals.reservation_id = data.reservation_id;
@@ -83,9 +93,7 @@ async function unseatTable(req, res) {
   return res.sendStatus(204);
 }
 async function readTable(req, res) {
-  const table_id = Number(req.params.table_id);
-  let data = await service.read(table_id);
-  return res.status(200).json({ data });
+  return res.status(200).json({ data: res.locals.table });
 }
 
 module.exports = {
@@ -93,5 +101,5 @@ module.exports = {
   create: [verifyTableData, asyncErrorHandler(createTable)],
   update: [preSeating, asyncErrorHandler(seatTable)],
   delete: [asyncErrorHandler(cleanUp), asyncErrorHandler(unseatTable)],
-  read: [asyncErrorHandler(readTable)]
+  read: [verifyTableId, asyncErrorHandler(readTable)]
 };

@@ -100,11 +100,14 @@ async function isValidID(req, res, next) {
   let reservation_id = Number(req.params.reservation_id);
   if (!reservation_id) {
     reservation_id = req.body.data?.reservation_id;
-    if (!reservation_id) return next({ status: 400, message: 'Reservation not found by express' });
+    if (!reservation_id)
+      return next({ status: 400, message: 'reservation_id not found by express' });
   }
   let reservation = await service.read(reservation_id);
-  if (!reservation) return next({ status: 400, message: 'Reservation not found in database' });
-  res.locals.reservation = reservation[0];
+  if (!reservation)
+    return next({ status: 404, message: `Reservation ${reservation_id}not found in database` });
+  res.locals.reservation_id = reservation_id;
+  res.locals.reservation = reservation;
   next();
 }
 
