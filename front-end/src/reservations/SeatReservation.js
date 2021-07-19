@@ -45,7 +45,7 @@ const SeatReservation = ({ tables }) => {
         <input className='btn btn-success' type="submit" onClick={seatHandler}>Submit</input>
       </select>
       <button className='btn btn-primary' onClick={() => history.goBack()}>
-        Back
+        Cancel
       </button>
     </div>
   );

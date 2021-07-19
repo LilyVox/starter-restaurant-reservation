@@ -10,7 +10,6 @@ export async function sendNewReservation(data) {
     headers,
     body,
   }; // could use axios, chose not to, maybe in the future
-  console.info(body);
   return await fetch(`${API_BASE_URL}/reservations/`, request);
 }
 
@@ -22,3 +21,4 @@ export async function loadReservation(reservation_id, signal) {
   };
   return await fetch(`${API_BASE_URL}/reservations/${reservation_id}`, request);
 }
+export default sendNewReservation;

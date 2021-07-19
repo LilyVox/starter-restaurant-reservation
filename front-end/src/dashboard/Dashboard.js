@@ -7,7 +7,7 @@ import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import TableDisplay from '../layout/subComponents/TableDisplay';
 import SeatReservation from '../reservations/SeatReservation';
 // import {loadReservation} from '../reservations/reservation.service';
-import { loadTables } from '../../tables/tables.service';
+import { loadTables, unseatTable } from '../tables/tables.service';
 
 /**
  * Defines the dashboard page.
@@ -25,13 +25,22 @@ function Dashboard({ date }) {
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
-    const abortController = new AbortController();
+    const abortControllerReservation = new AbortController();
+    const abortControllerTable = new AbortController();
     setReservationsError(null);
-    listReservations({ date }, abortController.signal)
+    listReservations({ date }, abortControllerReservation.signal)
       .then(setReservations)
       .catch(setReservationsError);
-    loadTables(abortController.signal).then(setTables).catch(setTablesError);
-    return () => abortController.abort();
+    loadTables(abortControllerTable.signal).then(setTables).catch(setTablesError);
+    return () => {
+      abortControllerReservation.abort()
+      abortControllerTable.abort()
+      setTablesError([])
+      setReservationsError(null);
+    };
+  }
+  const finishHandler = async(e)=>{
+    unseatTable()
   }
   let tableErrDisplay =
     tablesError.length > 0
@@ -46,14 +55,14 @@ function Dashboard({ date }) {
       {tableErrDisplay}
       <ErrorAlert error={reservationsError} />
       <Switch>
-        <Route exact={true} path='/reservations/:reservation_id/seat'>
-          <SeatReservation tables={tables} />
-        </Route>
-        <Route exact={true} path='/reservations/:reservation_id'>
+        <Route path='/'>
           <ReservationDisplay reservations={reservations} />
         </Route>
+        <Route path='/reservations/:reservation_id/seat'>
+          <SeatReservation tables={tables} />
+        </Route>
       </Switch>
-      <TableDisplay tables={tables} />
+      <TableDisplay finishHandler={finishHandler} tables={tables} />
       <button
         className='btn btn-dark'
         type='button'

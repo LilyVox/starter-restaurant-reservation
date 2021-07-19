@@ -28,9 +28,6 @@ function Routes() {
       <Route exact={true} path='/reservations'>
         <Redirect to={'/dashboard'} />
       </Route>
-      <Route path='/reservations/:reservation_id'>
-        <Redirect to={'/dashboard'} />
-      </Route>
       <Route exact={true} path='/tables/new'>
         <TableCUMain />
       </Route>

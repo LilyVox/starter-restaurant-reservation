@@ -25,13 +25,23 @@ export async function seatTable(data, table_id) {
   console.info('seating table: ' + body);
   return await fetch(`${API_BASE_URL}/tables/${table_id}/seat`, request);
 }
+export async function unseatTable(table_id) {
+  const request = {
+    method: 'DELETE',
+    headers,
+  };
+  return await fetch(`${API_BASE_URL}/tables/${table_id}/seat`, request);
+}
+
 export async function loadTables(signal) {
   const request = {
     method: 'GET',
     headers,
-    signal
+    signal,
   };
-  return await fetch(`${API_BASE_URL}/tables/`, request);
+  return await fetch(`${API_BASE_URL}/tables/`, request)
+  .then((response)=>response.json())
+  .then((response)=> response.data);
 }
 
-
+export default loadTables;
