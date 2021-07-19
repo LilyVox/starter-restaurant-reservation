@@ -29,14 +29,18 @@ function preSeating(req, res, next) {
   next();
 }
 async function cleanUp(req, res, next) {
-  const { table_id } = req.params;
+  const table_id = Number(req.params.table_id);
   if (!table_id) return next({ status: 400, message: 'no table to clean up' });
-  let table = await service
-    .list()
-    .then((data) => data.filter((aTable) => aTable.table_id === table_id));
+  let tables = await service.list();
+  let table = tables.filter((aTable) => aTable.table_id === table_id)[0];
   console.log(table);
-  if (!table || table?.status !== 'occupied') return next({ status: 400, message: 'Table isnt occupied' });
-  if (table) res.locals.table_id = table_id;
+  if (!table) {
+    return next({ status: 400, message: 'Table not found' });
+  }
+  if (table.status !== 'occupied') {
+    return next({ status: 400, message: 'Table isnt occupied' });
+  }
+  res.locals.table_id = table_id;
   next();
 }
 
@@ -69,8 +73,8 @@ async function seatTable(req, res) {
 }
 async function unseatTable(req, res) {
   const { table_id } = res.locals;
-  await service.update(table_id);
-  return res.status(204);
+  let data = await service.delete(table_id);
+  return res.sendStatus(204);
 }
 
 module.exports = {
