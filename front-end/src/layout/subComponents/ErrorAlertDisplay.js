@@ -9,9 +9,10 @@ import ErrorAlert from './ErrorAlert';
  */
 
 function ErrorAlertDisplay({ errors = [] }) {
-  let condition = errors.length > 0;
-  let errorD = errors.map((error, index) => <ErrorAlert key={index} error={{ error: error }} />);
-  return !!condition && <div className='alert alert-danger m-2'>{errorD}</div>;
+  let condition = errors.length > 1;
+  if(!condition) return (<ErrorAlert error={{ error: errors[0] }} />)
+  let errorDisplay = errors.map((error, index) => <ErrorAlert key={index} error={{ error: error }} />);
+  return !!condition && <div className='alert alert-danger m-2'>{errorDisplay}</div>;
 }
 
 export default ErrorAlertDisplay;
