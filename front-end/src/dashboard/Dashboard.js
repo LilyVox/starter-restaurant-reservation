@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory, Switch, Route } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { listReservations } from '../utils/api';
 import { previous, today, next } from '../utils/date-time';
 import ReservationDisplay from '../layout/subComponents/ReservationDisplay';

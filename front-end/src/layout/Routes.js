@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Dashboard from '../dashboard/Dashboard';
@@ -16,7 +16,6 @@ import useQuery from '../utils/useQuery';
  * @returns {JSX.Element}
  */
 function Routes() {
-
   const query = useQuery();
   const date = query.get('date');
   return (
