@@ -15,9 +15,13 @@ function read(reservation_id){
 function listByDate(reservation_date) {
   return Knex(tableName).select('*').where('reservation_date', reservation_date).orderBy('reservation_time', 'asc');
 }
+function updateStatus(reservation_id, newStatus){
+  return Knex(tableName).where('reservation_id', reservation_id).update('status', newStatus)
+}
 module.exports = {
   create,
   list,
   listByDate,
   read,
+  updateStatus,
 };

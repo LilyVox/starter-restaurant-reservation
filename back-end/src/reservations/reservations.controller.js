@@ -93,6 +93,9 @@ function verifyCapturedData(req, res, next) {
   if (typeof data.people !== 'number')
     return next({ status: 400, message: 'people field must be a number' });
   if (data.people < 1) return next({ status: 400, message: 'people field must be at least 1' });
+  if (data.status && data.status !== 'booked')
+    return next({ status: 400, message: 'status can only be booked when booking' });
+
   res.locals.reservation = data;
   next();
 }
@@ -100,15 +103,29 @@ async function isValidID(req, res, next) {
   let reservation_id = Number(req.params.reservation_id);
   if (!reservation_id) {
     reservation_id = req.body.data?.reservation_id;
-    if (!reservation_id)
-      return next({ status: 400, message: 'reservation_id not found by express' });
+    if (!reservation_id) return next({ status: 400, message: 'reservation_id not received' });
   }
   let reservation = await service.read(reservation_id);
   if (!reservation)
-    return next({ status: 404, message: `Reservation ${reservation_id}not found in database` });
+    return next({ status: 404, message: `Reservation ${reservation_id} not found in database` });
   res.locals.reservation_id = reservation_id;
   res.locals.reservation = reservation;
   next();
+}
+function preUpdateStatus(req, res, next) {
+  const { data } = req.body;
+  if (!data) return next({ status: 400, message: 'Body must include a data object' });
+  if (!data.status) return next({ status: 400, message: 'no status update' });
+  let status = res.locals.reservation.status;
+  if (status === data.status) {
+    return next({ status: 400, message: `status is already ${res.locals.reservation.status}` });
+  }
+  if (status === 'finished')
+    return next({ status: 400, message: 'cannot modify a finished order' });
+  if (data.status !== 'seated' || data.status !== 'finished')
+    return next({ status: 400, message: `Unknown or invalid status: ${data.status}` });
+  res.locals.status = data.status;
+  return next();
 }
 
 /**
@@ -147,9 +164,15 @@ async function createReservation(req, res) {
   res.status(201).json({ data: returning[0] });
 }
 
+async function updateStatus(req, res, next) {
+  await service.updateStatus(res.locals.reservation_id, res.locals.status);
+  res.sendStatus(200);
+}
+
 module.exports = {
   list: [asyncErrorHandler(list), verifyDateFormat, asyncErrorHandler(listByDate)],
   create: [verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
   read: [asyncErrorHandler(isValidID), read],
   isValidID,
+  statusUpdate: [asyncErrorHandler(isValidID), preUpdateStatus, updateStatus],
 };
