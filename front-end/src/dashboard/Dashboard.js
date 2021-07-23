@@ -43,9 +43,7 @@ function Dashboard({ date }) {
     };
   }
   const finishHandler = async (table_id) => {
-    let timeToFinish = window.confirm(
-      'Is this table ready to seat new guests? This cannot be undone.'
-    );
+    let timeToFinish = window.confirm('Is this table ready to seat new guests?');
     if (timeToFinish) {
       await unseatTable(table_id)
         .then((response) => {

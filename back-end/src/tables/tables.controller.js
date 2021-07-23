@@ -35,6 +35,7 @@ async function preSeating(req, res, next) {
   const { data } = req.body;
   if (!res.locals.reservation)
     return next({ status: 404, message: `reservation ${res.locals.reservation_id} not found` });
+  if (res.locals.reservation.status ==='seated') return next({ status: 400, message: `Reservation ${res.locals.reservation.reservation_id} is already seated` });
   if (!table_id) return next({ status: 400, message: 'no table id?' });
   if (!data) return next({ status: 400, message: 'Body must include a data object' });
   let theTable = await service.read(table_id);
