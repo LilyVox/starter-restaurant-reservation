@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { loadReservation } from './reservation.service';
+import { loadReservation, updateReservationStatus } from './reservation.service';
 import { seatTable, loadTables } from '../tables/tables.service';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
@@ -27,9 +27,10 @@ const SeatReservation = () => {
 
   const seatHandler = async () => {
     let theTable = tables.find(table=> Number(table.table_id) === Number(tablePicked))
-    if(theTable.capacity > reservation.people){
-      await seatTable(reservation_id, theTable.table_id).catch(setTablesError);
-      history.push('/dashboard');
+    if(theTable.capacity >= reservation.people){
+      await seatTable(reservation_id, theTable.table_id).then(response=>{
+        if(response.ok) history.push('/dashboard');
+      }).catch(setTablesError);
     } else setError({error: `${theTable.table_name} cannot seat ${reservation.people}`})
   };
   const selectHandler = (e) => {

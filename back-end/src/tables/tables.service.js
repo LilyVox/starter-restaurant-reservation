@@ -8,25 +8,44 @@ function list() {
 function create(aNewTable) {
   return Knex(tableName).insert(aNewTable).returning('*');
 }
-function read(table_id){
+function read(table_id) {
   return Knex(tableName).select('*').where('table_id', table_id).first();
 }
 /**
- * 
+ *
  * @param {integer} table_id the table to seat
  * @param {integer} reservation_id the reservation to be seated
  * @returns nothing, just seats the reservation
  */
-function update(table_id, reservation_id) {
-  return Knex(tableName).where('table_id', table_id).update({status:'occupied', reservation_id});
+async function update(table_id, reservation_id) {
+  return await Knex.transaction((trx) => {
+    return Knex(tableName)
+      .transacting(trx)
+      .where('reservation_id', reservation_id)
+      .update({ status: 'seated' });
+  })
+    .then(() => {
+      return trx(tableName)
+        .where('table_id', table_id)
+        .update({ status: 'occupied', reservation_id });
+    })
+    .then(() => {
+      console.log('it worked');
+    })
+    .catch((e) => {
+      console.log(e);
+      console.log('It failed');
+    });
 }
-function unseatTable(table_id){
-  return Knex(tableName).where('table_id', table_id).update({status: 'free', reservation_id: null})
+function unseatTable(table_id) {
+  return Knex(tableName)
+    .where('table_id', table_id)
+    .update({ status: 'free', reservation_id: null });
 }
 module.exports = {
   create,
   read,
   list,
-  update,
+  update: update,
   delete: unseatTable,
 };

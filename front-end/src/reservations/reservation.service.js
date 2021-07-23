@@ -23,4 +23,15 @@ export async function loadReservation(reservation_id, signal) {
   .then((response)=> response.json())
   .then((response)=> response.data);;
 }
+
+export async function updateReservationStatus(reservation_id, status){
+  let data = { status };
+  let body = JSON.stringify({ data });
+  const request = {
+    method: 'PUT',
+    headers,
+    body,
+  };
+  return await fetch(`${API_BASE_URL}/reservations/${reservation_id}/status`, request);
+}
 export default sendNewReservation;

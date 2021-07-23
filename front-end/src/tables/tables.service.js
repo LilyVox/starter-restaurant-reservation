@@ -22,9 +22,9 @@ export async function seatTable(reservation_id, table_id) {
     headers,
     body,
   };
-  console.info('seating table: ' + body);
   return await fetch(`${API_BASE_URL}/tables/${table_id}/seat`, request);
 }
+
 export async function unseatTable(table_id) {
   const request = {
     method: 'DELETE',

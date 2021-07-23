@@ -8,6 +8,7 @@ import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
 import TableDisplay from '../layout/subComponents/TableDisplay';
 // import {loadReservation} from '../reservations/reservation.service';
 import { loadTables, unseatTable } from '../tables/tables.service';
+import { updateReservationStatus } from '../reservations/reservation.service';
 
 /**
  * Defines the dashboard page.
@@ -29,6 +30,9 @@ function Dashboard({ date }) {
     const abortControllerTable = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortControllerReservation.signal)
+      .then((list) => {
+        return list.filter((reservation) => reservation.status !== 'finished');
+      })
       .then(setReservations)
       .catch(setReservationsError);
     loadTables(abortControllerTable.signal).then(setTables).catch(setTablesError);
@@ -39,16 +43,16 @@ function Dashboard({ date }) {
       setReservationsError(null);
     };
   }
-  const finishHandler = (table_id) => {
-    let timeToFinish = window.confirm('Is this table ready to seat new guests? This cannot be undone.');
+  const finishHandler = async (table_id) => {
+    let timeToFinish = window.confirm(
+      'Is this table ready to seat new guests? This cannot be undone.'
+    );
     if (timeToFinish) {
-      unseatTable(table_id)
-        .then((response) => {
-          if (response.ok) {
-            history.push('/tables');
-          }
-        })
-        .catch(setTablesError);
+      await unseatTable(table_id);
+      let aTable = tables.find((table) => table.table_id === table_id);
+      let reservationId = aTable.reservation_id;
+      await updateReservationStatus(reservationId, 'finished');
+      history.push('/tables');
     }
   };
 

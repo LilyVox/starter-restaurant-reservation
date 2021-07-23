@@ -9,7 +9,7 @@ const reservationsController = require('../reservations/reservations.controller'
  */
 router
   .route('/:table_id/seat')
-  .put(reservationsController.isValidID, reservationsController.statusUpdate, controller.update)
+  .put(reservationsController.isValidID, controller.update)
   .delete(controller.delete)
   .all(methodNotAllowed);
 router.route('/:table_id').get(controller.read).all(methodNotAllowed);

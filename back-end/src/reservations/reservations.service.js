@@ -1,4 +1,5 @@
 const Knex = require('../db/connection');
+const asyncErrorHandler = require('../errors/asyncErrorHandler');
 
 const tableName = 'reservations';
 

@@ -13,29 +13,32 @@ function verifyTableData(req, res, next) {
   if (typeof data.capacity !== 'number')
     return next({ status: 400, message: 'capacity field must be a number' });
   if (data.capacity < 1) return next({ status: 400, message: 'capacity field must be at least 1' });
-  if(data.table_name.length < 2) return next({status:400, message:'table_name must be 2 or more characters'})
-  let status = data.reservation_id? 'occupied': 'free';
+  if (data.table_name.length < 2)
+    return next({ status: 400, message: 'table_name must be 2 or more characters' });
+  let status = data.reservation_id ? 'occupied' : 'free';
   res.locals.table = { ...data, status: status };
-  
+
   next();
 }
-async function verifyTableId(req, res, next){
+async function verifyTableId(req, res, next) {
   const table_id = Number(req.params.table_id);
-  if(!table_id || Number.isNaN(table_id)) return next({status:400, message:'Missing table ID'})
+  if (!table_id || Number.isNaN(table_id))
+    return next({ status: 400, message: 'Missing table ID' });
   res.locals.table_id = table_id;
   let data = await service.read(res.locals.table_id);
-  if(!data) return next({status:404, message:`table ${table_id} not found`})
+  if (!data) return next({ status: 404, message: `table ${table_id} not found` });
   res.locals.table = data;
   next();
 }
 async function preSeating(req, res, next) {
   const { table_id } = req.params;
   const { data } = req.body;
-  if (!res.locals.reservation) return next({ status: 404, message: `reservation ${res.locals.reservation_id} not found` });
+  if (!res.locals.reservation)
+    return next({ status: 404, message: `reservation ${res.locals.reservation_id} not found` });
   if (!table_id) return next({ status: 400, message: 'no table id?' });
   if (!data) return next({ status: 400, message: 'Body must include a data object' });
   let theTable = await service.read(table_id);
-  if(theTable.status !== 'free') return next({status:400, message:'table is occupied'})
+  if (theTable.status !== 'free') return next({ status: 400, message: 'table is occupied' });
   if (res.locals.reservation.people > theTable.capacity) {
     return next({
       status: 400,
@@ -68,7 +71,6 @@ async function list(req, res, next) {
  * after field verification
  */
 async function createTable(req, res) {
-  console.log(res.locals.table)
   const returning = await service.create(res.locals.table);
   res.status(201).json({ data: returning[0] });
 }
@@ -86,7 +88,7 @@ async function unseatTable(req, res) {
   await service.delete(table_id);
   return res.sendStatus(200);
 }
-async function readTable(req, res) {
+function readTable(req, res) {
   return res.status(200).json({ data: res.locals.table });
 }
 
@@ -95,5 +97,5 @@ module.exports = {
   create: [verifyTableData, asyncErrorHandler(createTable)],
   update: [preSeating, asyncErrorHandler(seatTable)],
   delete: [verifyTableId, asyncErrorHandler(cleanUp), asyncErrorHandler(unseatTable)],
-  read: [verifyTableId, asyncErrorHandler(readTable)]
+  read: [verifyTableId, readTable],
 };
