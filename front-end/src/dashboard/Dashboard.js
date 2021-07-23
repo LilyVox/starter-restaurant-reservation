@@ -8,7 +8,6 @@ import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
 import TableDisplay from '../layout/subComponents/TableDisplay';
 // import {loadReservation} from '../reservations/reservation.service';
 import { loadTables, unseatTable } from '../tables/tables.service';
-import { updateReservationStatus } from '../reservations/reservation.service';
 
 /**
  * Defines the dashboard page.
