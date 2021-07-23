@@ -49,7 +49,7 @@ async function preSeating(req, res, next) {
   res.locals.table = theTable;
   next();
 }
-async function cleanUp(req, res, next) {
+async function checkIfOccupied(req, res, next) {
   if (res.locals.table.status !== 'occupied') {
     return next({ status: 400, message: 'Table is not occupied' });
   }
@@ -96,6 +96,6 @@ module.exports = {
   list: [asyncErrorHandler(list)],
   create: [verifyTableData, asyncErrorHandler(createTable)],
   update: [preSeating, asyncErrorHandler(seatTable)],
-  delete: [verifyTableId, asyncErrorHandler(cleanUp), asyncErrorHandler(unseatTable)],
+  delete: [verifyTableId, checkIfOccupied, asyncErrorHandler(unseatTable)],
   read: [verifyTableId, readTable],
 };

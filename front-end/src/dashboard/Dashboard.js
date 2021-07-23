@@ -48,11 +48,12 @@ function Dashboard({ date }) {
       'Is this table ready to seat new guests? This cannot be undone.'
     );
     if (timeToFinish) {
-      await unseatTable(table_id);
-      let aTable = tables.find((table) => table.table_id === table_id);
-      let reservationId = aTable.reservation_id;
-      await updateReservationStatus(reservationId, 'finished');
-      history.push('/tables');
+      await unseatTable(table_id)
+        .then((response) => {
+          console.log(response);
+          if (response.ok) history.push('/tables');
+        })
+        .catch(setTablesError);
     }
   };
 
