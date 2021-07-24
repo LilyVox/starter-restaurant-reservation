@@ -12,6 +12,15 @@ function verifyDateFormat(req, res, next) {
     next();
   }
 }
+function verifyPhoneFormat(req, res, next) {
+  if (req.query.mobile_number) {
+    let { mobile_number } = req.query;
+    mobile_number = mobile_number.replace(/\D/g, '');
+    if (mobile_number.length < 7) return next({ status: 400, message: 'invalid mobile number' });
+    res.locals.mobileNumber = mobile_number;
+    return next();
+  } else return next({ status: 400, message: 'No mobile number' });
+}
 
 function verifyDate(req, res, next) {
   const reservation = res.locals.reservation;
@@ -116,7 +125,7 @@ function preUpdateStatus(req, res, next) {
   if (!data) return next({ status: 400, message: 'Body must include a data object' });
   if (!data.status) return next({ status: 400, message: 'no status update' });
   let status = res.locals.reservation.status;
-  if (status == data.status && status ==='seated') {
+  if (status == data.status && status === 'seated') {
     return next({ status: 400, message: `status is already ${status}` });
   }
   if (status === 'finished')
@@ -132,7 +141,7 @@ function preUpdateStatus(req, res, next) {
  * @returns a list of reservations to the client
  */
 async function list(req, res, next) {
-  if (req.query?.date) next();
+  if (req.query?.date || req.query?.mobile_number) next();
   else {
     const data = await service.list();
     res.status(200).json({ data });
@@ -148,7 +157,8 @@ function read(req, res) {
  *
  * is in the pipeline after list()
  */
-async function listByDate(req, res) {
+async function listByDate(req, res, next) {
+  if (req.query.mobile_number) return next();
   const theDate = res.locals.date;
   const data = await service.listByDate(theDate);
   res.status(200).json({ data });
@@ -167,11 +177,21 @@ async function updateStatus(req, res) {
   let data = await service.updateStatus(res.locals.reservation_id, res.locals.status);
   res.status(200).json({ data: data[0] });
 }
+async function search(req, res) {
+  let data = await service.search(res.locals.mobileNumber);
+  res.status(200).json({ data: data[0] });
+}
 
 module.exports = {
-  list: [asyncErrorHandler(list), verifyDateFormat, asyncErrorHandler(listByDate)],
+  list: [
+    asyncErrorHandler(list),
+    verifyDateFormat,
+    asyncErrorHandler(listByDate),
+    verifyPhoneFormat,
+    asyncErrorHandler(search),
+  ],
   create: [verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
   read: [asyncErrorHandler(isValidID), read],
-  isValidID:[asyncErrorHandler(isValidID)],
+  isValidID: [asyncErrorHandler(isValidID)],
   statusUpdate: [asyncErrorHandler(isValidID), preUpdateStatus, asyncErrorHandler(updateStatus)],
 };
