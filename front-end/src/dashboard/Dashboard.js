@@ -6,7 +6,6 @@ import ReservationDisplay from '../layout/subComponents/ReservationDisplay';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
 import TableDisplay from '../layout/subComponents/TableDisplay';
-// import {loadReservation} from '../reservations/reservation.service';
 import { loadTables, unseatTable } from '../tables/tables.service';
 
 /**
@@ -29,9 +28,6 @@ function Dashboard({ date }) {
     const abortControllerTable = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortControllerReservation.signal)
-      .then((list) => {
-        return list.filter((reservation) => reservation.status !== 'finished');
-      })
       .then(setReservations)
       .catch(setReservationsError);
     loadTables(abortControllerTable.signal).then(setTables).catch(setTablesError);
@@ -47,8 +43,9 @@ function Dashboard({ date }) {
     if (timeToFinish) {
       await unseatTable(table_id)
         .then((response) => {
-          console.log(response);
-          if (response.ok) history.push('/tables');
+          if (response.ok) {
+            history.push('/tables')
+          };
         })
         .catch(setTablesError);
     }
