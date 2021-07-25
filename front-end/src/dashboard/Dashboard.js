@@ -14,7 +14,7 @@ import { loadTables, unseatTable } from '../tables/tables.service';
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function Dashboard({ date, cancelHandler }) {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
@@ -44,8 +44,8 @@ function Dashboard({ date }) {
       await unseatTable(table_id)
         .then((response) => {
           if (response.ok) {
-            history.push('/tables')
-          };
+            history.push('/tables');
+          }
         })
         .catch(setTablesError);
     }
@@ -60,7 +60,7 @@ function Dashboard({ date }) {
       <ErrorAlertDisplay errors={tablesError} />
       <ErrorAlert error={reservationsError} />
       <div className='col-4'>
-        <ReservationDisplay reservations={reservations} />
+        <ReservationDisplay cancelHandler={cancelHandler} reservations={reservations} />
       </div>
       <div className='col-4'>
         <TableDisplay finishHandler={finishHandler} tables={tables} />

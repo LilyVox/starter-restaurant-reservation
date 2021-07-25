@@ -5,6 +5,8 @@ import Dashboard from '../dashboard/Dashboard';
 import NotFound from './subComponents/NotFound';
 import ReservationPage from '../reservations/main';
 import SeatReservation from '../reservations/SeatReservation';
+import { updateReservationStatus } from '../reservations/reservation.service';
+
 import TableCUMain from '../tables/main';
 import SearchHomepage from '../search/main';
 import { today } from '../utils/date-time';
@@ -17,9 +19,13 @@ import useQuery from '../utils/useQuery';
  * @returns {JSX.Element}
  */
 function Routes() {
-  
   const query = useQuery();
   const date = query.get('date');
+  const cancelHandler = async (reservation_id) => {
+    if (window.confirm('Do you want to cancel this reservation? This cannot be undone.')) {
+      await updateReservationStatus(reservation_id, 'cancelled');
+    }
+  };
   return (
     <Switch>
       <Route exact={true} path='/'>
@@ -32,7 +38,7 @@ function Routes() {
         <Redirect to={'/dashboard'} />
       </Route>
       <Route exact={true} path='/search'>
-        <SearchHomepage/>
+        <SearchHomepage cancelHandler={cancelHandler} />
       </Route>
       <Route exact={true} path='/reservations/:reservation_id/seat'>
         <SeatReservation />
@@ -44,7 +50,7 @@ function Routes() {
         <Redirect to={'/dashboard'} />
       </Route>
       <Route path='/dashboard'>
-        <Dashboard date={date ? date : today()} />
+        <Dashboard date={date ? date : today()} cancelHandler={cancelHandler} />
       </Route>
       <Route>
         <NotFound />

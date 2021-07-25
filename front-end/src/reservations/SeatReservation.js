@@ -15,7 +15,6 @@ const SeatReservation = () => {
   const [tablesError, setTablesError] = useState([]);
   const [tableIdValue, setTableIdValue] = useState();
 
-  console.log(tableIdValue);
   useEffect(() => {
     const abort = new AbortController();
     const abortControllerTable = new AbortController();

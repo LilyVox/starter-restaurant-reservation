@@ -1,11 +1,29 @@
 import React from 'react';
 
-const ReservationItem = ({ res, index, suppressSeat = null }) => {
+const ReservationItem = ({ res, index, suppressSeat = null, cancelHandler = null }) => {
   const SeatDisplay = () => {
     return (
       <a className='btn btn-success' href={`/reservations/${res.reservation_id}/seat`}>
         Seat
       </a>
+    );
+  };
+  const EditDisplay = () => {
+    return (
+      <a className='btn btn-primary' href={`/reservations/${res.reservation_id}/edit`}>
+        Edit
+      </a>
+    );
+  };
+  const CancelDisplay = () => {
+    if(cancelHandler === null) return null;
+    return (
+      <button
+        className='btn btn-primary'
+        onClick={() => cancelHandler(res.reservation_id)}
+        data-reservation-id-cancel={res.reservation_id}>
+        Cancel
+      </button>
     );
   };
   let condition = res.status !== 'finished';
@@ -24,7 +42,11 @@ const ReservationItem = ({ res, index, suppressSeat = null }) => {
         <div
           className='card-body'
           data-reservation-id-status={res.reservation_id}>{`${res.status}`}</div>
-        <div className='card-footer'>{`${res.reservation_time}`}</div>
+        <div className='card-footer'>
+          <CancelDisplay />
+          {` ${res.reservation_time} `}
+          <EditDisplay />
+        </div>
         {seatCondition && <SeatDisplay />}
       </div>
     )
