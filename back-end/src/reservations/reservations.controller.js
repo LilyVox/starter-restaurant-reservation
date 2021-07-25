@@ -180,7 +180,9 @@ async function updateStatus(req, res) {
 }
 async function search(req, res) {
   let data = await service.search(res.locals.mobileNumber);
-  res.status(200).json({ data: data[0] });
+  if (_.isEmpty(data)) {
+    res.status(200).json({ data: [] });
+  } else res.status(200).json({ data: data });
 }
 
 module.exports = {
