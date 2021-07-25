@@ -7,7 +7,7 @@ const TableForm = ({ changeHandler, submitHandler }) => {
         name='new_table_form'
         onSubmit={submitHandler}
         onChange={changeHandler}
-        className='flex-col card bg-transparent shadow m-2 p-2'>
+        className='flex-col bg-transparent m-2 p-2'>
         <label className='form-label' htmlFor='table_name'>
           Table Name
         </label>

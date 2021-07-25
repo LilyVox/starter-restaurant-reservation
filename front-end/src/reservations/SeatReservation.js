@@ -5,7 +5,7 @@ import { loadReservation } from './reservation.service';
 import { seatTable, loadTables } from '../tables/tables.service';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
-
+import ReservationItem from '../layout/subComponents/ReservationItem';
 const SeatReservation = () => {
   const [reservation, setReservation] = useState({});
   const { reservation_id } = useParams();
@@ -14,7 +14,7 @@ const SeatReservation = () => {
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState([]);
   const [tableIdValue, setTableIdValue] = useState();
-  
+
   console.log(tableIdValue);
   useEffect(() => {
     const abort = new AbortController();
@@ -65,13 +65,10 @@ const SeatReservation = () => {
   }
 
   return (
-    <div className='card flex-4 text-center bg-transparent m-2 shadow' style={{ width: '' }}>
-      {`Reservation id: ${reservation_id}`}
+    <div className='d-flex flex-column justify-content-center bg-transparent m-2 shadow'>
       <ErrorAlert error={error} />
       <ErrorAlertDisplay errors={tablesError} />
-      <div className='card-header'>{`Reservation for ${reservation.people}`}</div>
-      <div className='card-body'>{`${reservation.first_name}, ${reservation.last_name}`}</div>
-      <div className='card-footer'>{`${reservation.reservation_time}`}</div>
+      <ReservationItem suppressSeat={true} res={reservation} index={reservation.reservation_id}/>
       <TableOptionDisplay />
       <button className='btn btn-success' type='submit' onClick={seatHandler}>
         Submit

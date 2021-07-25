@@ -11,9 +11,9 @@ import './Layout.css';
  */
 function Layout() {
   return (
-    <div className='container-fluid bg-secondary'>
-      <div className='row h-100'>
-        <div className='col-md-2 side-bar'>
+    <div className='container-fluid text-white bg-dark bg-gradient'>
+      <div className='row h-100 '>
+        <div className='col-md-2 side-bar bg-dark bg-gradient rounded-1 shadow-lg'>
           <Menu />
         </div>
         <div className='col'>

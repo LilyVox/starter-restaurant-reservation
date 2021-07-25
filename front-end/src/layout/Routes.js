@@ -6,6 +6,7 @@ import NotFound from './subComponents/NotFound';
 import ReservationPage from '../reservations/main';
 import SeatReservation from '../reservations/SeatReservation';
 import TableCUMain from '../tables/main';
+import SearchHomepage from '../search/main';
 import { today } from '../utils/date-time';
 import useQuery from '../utils/useQuery';
 
@@ -16,6 +17,7 @@ import useQuery from '../utils/useQuery';
  * @returns {JSX.Element}
  */
 function Routes() {
+  
   const query = useQuery();
   const date = query.get('date');
   return (
@@ -28,6 +30,9 @@ function Routes() {
       </Route>
       <Route exact={true} path='/reservations'>
         <Redirect to={'/dashboard'} />
+      </Route>
+      <Route exact={true} path='/search'>
+        <SearchHomepage/>
       </Route>
       <Route exact={true} path='/reservations/:reservation_id/seat'>
         <SeatReservation />

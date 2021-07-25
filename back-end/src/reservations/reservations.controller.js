@@ -1,5 +1,6 @@
 const service = require('./reservations.service');
 const asyncErrorHandler = require('../errors/asyncErrorHandler');
+const _ = require('underscore');
 
 function verifyDateFormat(req, res, next) {
   if (req.query?.date) {
@@ -16,7 +17,7 @@ function verifyPhoneFormat(req, res, next) {
   if (req.query.mobile_number) {
     let { mobile_number } = req.query;
     mobile_number = mobile_number.replace(/\D/g, '');
-    if (mobile_number.length < 7) return next({ status: 400, message: 'invalid mobile number' });
+    if (_.isEmpty(mobile_number)) return next({ status: 400, message: 'invalid mobile number' });
     res.locals.mobileNumber = mobile_number;
     return next();
   } else return next({ status: 400, message: 'No mobile number' });
