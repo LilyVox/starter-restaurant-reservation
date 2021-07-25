@@ -4,7 +4,7 @@ import { search } from './search.service';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import _ from 'underscore';
 const SearchHomepage = () => {
-  const [reservationSearch, setReservationSearch] = useState({});
+  const [reservationSearch, setReservationSearch] = useState([]);
   const [error, setError] = useState({});
   let reservationSearchCondition = _.isEmpty(reservationSearch);
   const submitHandler = async (e) => {
@@ -30,18 +30,18 @@ const SearchHomepage = () => {
             <input
               className='form-control'
               name='mobile_number'
+              id='mobile_number'
               type='tel'
               placeholder="Enter a customer's phone number"
             />
-            <button className='btn btn-warning'>submit</button>
+            <button type='submit' className='btn btn-warning'>
+              submit
+            </button>
           </form>
         </div>
-        <div className='col-6 '>
-          {reservationSearchCondition ? (
-            <ReservationDisplay
-              reservations={reservationSearch}
-              key={reservationSearch.reservation_id}
-            />
+        <div className='col-6'>
+          {!reservationSearchCondition ? (
+            <ReservationDisplay reservations={reservationSearch} />
           ) : (
             `No reservations found`
           )}

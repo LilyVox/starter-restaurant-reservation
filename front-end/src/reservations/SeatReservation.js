@@ -30,7 +30,6 @@ const SeatReservation = () => {
   const seatHandler = async (e) => {
     e.preventDefault();
     let tableSelected = tables[tableIdValue];
-    console.log(e, tableSelected);
     if (tableSelected && tableSelected.hasOwnProperty('capacity')) {
       if (tableSelected.capacity >= reservation.people) {
         await seatTable(reservation_id, tableSelected.table_id)
