@@ -33,13 +33,13 @@ function Dashboard({ date, cancelHandler }) {
       abortControllerTable.abort();
     };
   }
-  const finishHandler = (table_id) => {
-    let timeToFinish = window.confirm('Is this table ready to seat new guests?');
-    if (timeToFinish) {
+
+  const finishHandler = (table_id, e) => {
+    if (window.confirm('Is this table ready to seat new guests?')) {
       unseatTable(table_id)
         .then((response) => {
           if (response.ok) {
-            history.push('/reservations');
+            loadTables().then(setTables)
           } else setErrorArray([...errorArray, { error: 'did not "ok"' }]);
         })
         .catch(setErrorArray);

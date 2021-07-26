@@ -7,16 +7,16 @@ export const TableShape = ({ table, finishHandler }) => {
       className='card flex-4 text-center bg-transparent border-bottom rounded-3 border-0 m-2 shadow'
       style={{ width: '16EM' }}>
       <div className='card-header border-secondary'>{`${table.table_name} Seats up to ${table.capacity}`}</div>
-      <div
+      <p
         className={`card-body ${!condition ? 'bg-success' : 'bg-warning'}`}
         data-table-id-status={table.table_id}>
-        {table.status} {table.reservation_id && ` with ${table.reservation_id}`}
-      </div>
-      {condition && (
+        {table.reservation_id? "occupied": "free"}
+      </p>
+      {table.reservation_id && (
         <button
           className='btn btn-danger'
           data-table-id-finish={table.table_id}
-          onClick={() => finishHandler(table.table_id)}>
+          onClick={(e) => finishHandler(table.table_id, e)}>
           Finish
         </button>
       )}
