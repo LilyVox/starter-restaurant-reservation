@@ -1,7 +1,7 @@
 import React from 'react';
 
 function NewReservationForm({ reservation = {}, submitHandler, changeHandler }) {
-  let date = reservation?.reservation_date.slice(0, 10);
+  
   return (
     <form
       onSubmit={submitHandler}
@@ -85,7 +85,7 @@ function NewReservationForm({ reservation = {}, submitHandler, changeHandler }) 
             type='date'
             id='reservation_date'
             name='reservation_date'
-            value={date}
+            value={reservation['reservation_date']}
             onChange={changeHandler}
             required
           />

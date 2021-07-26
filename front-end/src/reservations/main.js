@@ -7,12 +7,12 @@ import sendNewReservation, {
   updateExistingReservation,
 } from './reservation.service';
 const reservationObject = {
-  "first_name": '',
-  "last_name": '',
-  "mobile_number": '',
-  "reservation_time": '',
-  "reservation_date": '',
-  "people": 0,
+  first_name: '',
+  last_name: '',
+  mobile_number: '',
+  reservation_time: '',
+  reservation_date: '',
+  people: 1,
 };
 /**
  * @returns the reservation moderation screen.
@@ -31,13 +31,15 @@ function ReservationMain() {
     if (areWeEditing) {
       const abort = new AbortController();
       loadReservation(reservation_id, abort.signal)
-        .then(setReservation)
+        .then((data) => {
+          setReservation({ ...data, reservation_date: data.reservation_date.slice(0, 10) });
+        })
         .catch(setReservationsError);
       return () => {
         abort.abort();
       };
-    } else{
-      setReservation(reservationObject)
+    } else {
+      setReservation(reservationObject);
     }
   }, [areWeEditing, reservation_id]);
 
@@ -48,22 +50,24 @@ function ReservationMain() {
       return true;
     });
     if (validToSend) {
+      const updatedReservation = {
+        ...reservation,
+        mobile_number: formatPhoneNum(reservation.mobile_number),
+        reservation_date: formatDate(reservation.reservation_date),
+      };
       if (areWeEditing) {
-        const updatedReservation = {
-          ...reservation,
-          reservation_date: reservation.reservation_date.slice(0, 10),
-        };
-        await updateExistingReservation(reservation_id, updatedReservation).then((response) => {
-          if (response.ok) {
-            history.push(`/dashboard?date=${formatDate(reservation.reservation_date)}`);
-            return response.json();
-          }
-        }).catch((e)=>errors.push(e));
+        await updateExistingReservation(reservation_id, updatedReservation)
+          .then((response) => {
+            if (response.ok) {
+              history.push(`/dashboard?date=${formatDate(reservation.reservation_date)}`);
+              return response.json();
+            }
+          })
+          .catch((e) => errors.push(e));
       } else {
-        await sendNewReservation(reservation).then((response) => {
+        await sendNewReservation(updatedReservation).then((response) => {
           if (response.ok) {
             history.push(`/dashboard?date=${reservation.reservation_date}`);
-            return response.json();
           }
         });
       }
@@ -111,14 +115,7 @@ function ReservationMain() {
   }
   const changeHandler = ({ target }) => {
     let keyName = target.name;
-    let value =
-      keyName === 'people'
-        ? Number(target.value)
-        : keyName === 'mobile_number'
-        ? formatPhoneNum(target.value)
-        : keyName === 'reservation_date'
-        ? formatDate(target.value)
-        : target.value;
+    let value = keyName === 'people' ? Number(target.value) : target.value;
     setReservation({
       ...reservation,
       [keyName]: value,
@@ -133,13 +130,14 @@ function ReservationMain() {
   }
   function formatDate(reservation_date) {
     if (reservation_date.match(/\d{4}-\d{2}-\d{2}/)) return reservation_date;
-    if (reservation_date.match(/\d{8}/)) return reservation_date.replace(/(\d{4})-?(\d{2})-?(\d{2})/, '$1-$2-$3');
+    if (reservation_date.match(/\d{8}/))
+      return reservation_date.replace(/(\d{4})-?(\d{2})-?(\d{2})/, '$1-$2-$3');
     return reservation_date.slice(0, 10);
   }
 
   return (
     <main className='container-fluid justify-content-center'>
-      <h1 className='my-0'>{areWeEditing? 'Edit':'Create'} Reservation</h1>
+      <h1 className='my-0'>{areWeEditing ? 'Edit' : 'Create'} Reservation</h1>
       <ErrorAlertDisplay error={{ reservationsError }} />
       <NewReservationForm
         reservation={reservation}
