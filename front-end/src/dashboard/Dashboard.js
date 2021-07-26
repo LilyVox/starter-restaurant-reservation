@@ -33,14 +33,14 @@ function Dashboard({ date, cancelHandler }) {
       abortControllerTable.abort();
     };
   }
-  const finishHandler = async (table_id) => {
+  const finishHandler = (table_id) => {
     let timeToFinish = window.confirm('Is this table ready to seat new guests?');
     if (timeToFinish) {
-      await unseatTable(table_id)
+      unseatTable(table_id)
         .then((response) => {
           if (response.ok) {
-            history.push('/tables');
-          }
+            history.push('/reservations');
+          } else setErrorArray([...errorArray, { error: 'did not "ok"' }]);
         })
         .catch(setErrorArray);
     }
@@ -52,7 +52,7 @@ function Dashboard({ date, cancelHandler }) {
         <h1 className='m-1'>Dashboard</h1>
         <h4 className=''>Reservations for {date}</h4>
       </div>
-      <ErrorAlertDisplay errors={errorArray} />
+      <ErrorAlertDisplay incErrors={errorArray} />
       <div className='col-6'>
         <ReservationDisplay
           showWhenFinished={false}

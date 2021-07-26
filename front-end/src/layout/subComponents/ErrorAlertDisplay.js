@@ -1,18 +1,19 @@
 import React from 'react';
 import ErrorAlert from './ErrorAlert';
 /**
- * Defines the alert message to render if the specified error is truthy.
- * @param error
- *  an instance of an object with `.message` property as a string, typically an Error instance.
+ * @param errors an array of strings
  * @returns {JSX.Element}
  *  a bootstrap danger alert that contains the message string.
  */
 
-function ErrorAlertDisplay({ errors = [] }) {
-  let condition = errors.length > 1;
-  if(!condition) return (<ErrorAlert error={{ error: errors[0] }} />)
-  let errorDisplay = errors.map((error, index) => <ErrorAlert key={index} error={{ error: error }} />);
-  return !!condition && <div className='alert alert-danger m-2'>{errorDisplay}</div>;
+function ErrorAlertDisplay({ incErrors }) {
+  let doHaveErrors = incErrors && incErrors.length > 0;
+  if (doHaveErrors) {
+    let condition = incErrors.length > 1;
+    if (!condition) return <ErrorAlert error={{ error: incErrors[0] }} />;
+    return incErrors.map((error, index) => <ErrorAlert key={index} error={{ error: error }} />);
+  }
+  return null;
 }
 
 export default ErrorAlertDisplay;

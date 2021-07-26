@@ -65,7 +65,7 @@ const SeatReservation = () => {
   return (
     <div className='d-flex flex-column justify-content-center bg-transparent m-2 shadow'>
       <ErrorAlert error={error} />
-      <ErrorAlertDisplay errors={tablesError} />
+      <ErrorAlertDisplay incErrors={tablesError} />
       <ReservationItem suppressSeat={true} res={reservation} index={reservation.reservation_id}/>
       <TableOptionDisplay />
       <button className='btn btn-success' type='submit' onClick={seatHandler}>

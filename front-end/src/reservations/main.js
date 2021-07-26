@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import _ from 'underscore';
 import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
 import NewReservationForm from './NewReservationForm';
 import sendNewReservation, {
@@ -20,9 +21,9 @@ const reservationObject = {
 function ReservationMain() {
   const location = useLocation();
   const [reservation, setReservation] = useState(reservationObject);
-  const [reservationsError, setReservationsError] = useState([{}]);
+  const [errorState, setErrorState] = useState([]);
   const history = useHistory();
-  let errors = [];
+  let localErrors = [];
   let pathArr = location.pathname.split('/');
   let reservation_id = pathArr[2];
   let areWeEditing = pathArr[3] === 'edit';
@@ -34,22 +35,21 @@ function ReservationMain() {
         .then((data) => {
           setReservation({ ...data, reservation_date: data.reservation_date.slice(0, 10) });
         })
-        .catch(setReservationsError);
+        .catch(e=>setErrorState([e.message]));
       return () => {
         abort.abort();
+        setErrorState([]);
       };
     } else {
       setReservation(reservationObject);
+      setErrorState([]);
     }
   }, [areWeEditing, reservation_id]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    let validToSend = await checkFields().then((errors) => {
-      if (errors.length > 0) return false;
-      return true;
-    });
-    if (validToSend) {
+    checkFields();
+    if (_.isEmpty(localErrors)) {
       const updatedReservation = {
         ...reservation,
         mobile_number: formatPhoneNum(reservation.mobile_number),
@@ -63,20 +63,22 @@ function ReservationMain() {
               return response.json();
             }
           })
-          .catch((e) => errors.push(e));
+          .catch((e) => localErrors.push(e));
       } else {
-        await sendNewReservation(updatedReservation).then((response) => {
-          if (response.ok) {
-            history.push(`/dashboard?date=${reservation.reservation_date}`);
-          }
-        });
+        await sendNewReservation(updatedReservation)
+          .then((response) => {
+            if (response.ok) {
+              history.push(`/dashboard?date=${updatedReservation.reservation_date}`);
+            }
+          })
+          .catch((e) => localErrors.push(e));
       }
-    }
+    } else setErrorState([...localErrors]);
   };
   /**
    * Validates the date to make sure it's reasonable
    */
-  async function checkFields() {
+  function checkFields() {
     const reservationDate = areWeEditing
       ? new Date(
           `${reservation.reservation_date.slice(0, 10)}T${reservation.reservation_time}:00.000`
@@ -84,34 +86,33 @@ function ReservationMain() {
       : new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`);
     const today = new Date();
     if (reservationDate.getDay() === 2) {
-      errors.push("'reservation_date' field: restaurant is closed on tuesday");
+      localErrors.push("'reservation_date' field: restaurant is closed on tuesday");
     }
     if (reservationDate < today) {
-      errors.push("'reservation_date' and 'reservation_time' field must be in the future");
+      localErrors.push("'reservation_date' and 'reservation_time' field must be in the future");
     }
     if (
       reservationDate.getHours() < 10 ||
       (reservationDate.getHours() === 10 && reservationDate.getMinutes() < 30)
     ) {
-      errors.push("'reservation_time' field: restaurant is not open until 10:30AM");
+      localErrors.push("'reservation_time' field: restaurant is not open until 10:30AM");
     }
     if (
       reservationDate.getHours() > 22 ||
       (reservationDate.getHours() === 22 && reservationDate.getMinutes() >= 30)
     ) {
-      errors.push("'reservation_time' field: restaurant is closed after 10:30PM");
+      localErrors.push("'reservation_time' field: restaurant is closed after 10:30PM");
     }
     if (
       reservationDate.getHours() > 21 ||
       (reservationDate.getHours() === 21 && reservationDate.getMinutes() > 30)
     ) {
-      errors.push(
+      localErrors.push(
         "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)"
       );
     }
-    if (errors.length > 0) setReservationsError([...errors]);
-    else setReservationsError([]);
-    return errors;
+    setErrorState([...localErrors])
+    return localErrors;
   }
   const changeHandler = ({ target }) => {
     let keyName = target.name;
@@ -138,7 +139,7 @@ function ReservationMain() {
   return (
     <main className='container-fluid justify-content-center'>
       <h1 className='my-0'>{areWeEditing ? 'Edit' : 'Create'} Reservation</h1>
-      <ErrorAlertDisplay error={{ reservationsError }} />
+      <ErrorAlertDisplay incErrors={errorState} />
       <NewReservationForm
         reservation={reservation}
         submitHandler={submitHandler}
