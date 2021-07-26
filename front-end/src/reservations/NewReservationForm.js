@@ -1,8 +1,14 @@
 import React from 'react';
 
-function NewReservationForm({ submitHandler, changeHandler }) {
+function NewReservationForm({ reservation = {}, submitHandler, changeHandler }) {
+  let date = reservation?.reservation_date.slice(0, 10);
   return (
-    <form onSubmit={submitHandler} onChange={changeHandler} className='' name='new_reservation'>
+    <form
+      onSubmit={submitHandler}
+      onChange={changeHandler}
+      className=''
+      id='reservation_form'
+      name='reservation_form'>
       <div className='row-auto'>
         <div className='col-auto'>
           <label className='form-label' htmlFor='first_name'>
@@ -14,6 +20,8 @@ function NewReservationForm({ submitHandler, changeHandler }) {
             type='text'
             id='first_name'
             placeholder='First Name'
+            value={reservation['first_name']}
+            onChange={changeHandler}
             required
             autoFocus
           />
@@ -24,7 +32,10 @@ function NewReservationForm({ submitHandler, changeHandler }) {
             className='form-control'
             type='text'
             name='last_name'
+            id='last_name'
             placeholder='Last Name'
+            value={reservation['last_name']}
+            onChange={changeHandler}
             required
           />
         </div>
@@ -34,13 +45,24 @@ function NewReservationForm({ submitHandler, changeHandler }) {
           </label>
           <input
             name='mobile_number'
+            id='mobile_number'
             className='form-control'
             type='tel'
+            onChange={changeHandler}
+            value={reservation['mobile_number']}
             placeholder='XXX-XXX-XXXX'
             required
           />
           <label htmlFor='people'>People</label>
-          <input className='form-control' type='number' name='people' id='people' required />
+          <input
+            className='form-control'
+            type='number'
+            name='people'
+            id='people'
+            required
+            value={reservation['people']}
+            onChange={changeHandler}
+          />
         </div>
         <div className='col-auto'>
           <label className='form-label' htmlFor='reservation_time'>
@@ -51,12 +73,22 @@ function NewReservationForm({ submitHandler, changeHandler }) {
             type='time'
             name='reservation_time'
             placeholder='HH:MM'
+            value={reservation['reservation_time']}
+            onChange={changeHandler}
             required
           />
           <label className='form-label' htmlFor='reservation_date'>
             Reservation Date
           </label>
-          <input className='form-control' type='date' name='reservation_date' required />
+          <input
+            className='form-control'
+            type='date'
+            id='reservation_date'
+            name='reservation_date'
+            value={date}
+            onChange={changeHandler}
+            required
+          />
         </div>
       </div>
       <div className='row m-4'>

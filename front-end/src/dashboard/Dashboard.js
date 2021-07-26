@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { listReservations } from '../utils/api';
 import { previous, today, next } from '../utils/date-time';
 import ReservationDisplay from '../layout/subComponents/ReservationDisplay';
-import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import ErrorAlertDisplay from '../layout/subComponents/ErrorAlertDisplay';
 import TableDisplay from '../layout/subComponents/TableDisplay';
 import { loadTables, unseatTable } from '../tables/tables.service';
@@ -17,8 +16,7 @@ import { loadTables, unseatTable } from '../tables/tables.service';
 function Dashboard({ date, cancelHandler }) {
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
-  const [tablesError, setTablesError] = useState([]);
+  const [errorArray, setErrorArray] = useState([]);
   const history = useHistory();
 
   useEffect(loadDashboard, [date]);
@@ -26,16 +24,13 @@ function Dashboard({ date, cancelHandler }) {
   function loadDashboard() {
     const abortControllerReservation = new AbortController();
     const abortControllerTable = new AbortController();
-    setReservationsError(null);
     listReservations({ date }, abortControllerReservation.signal)
       .then(setReservations)
-      .catch(setReservationsError);
-    loadTables(abortControllerTable.signal).then(setTables).catch(setTablesError);
+      .catch(setErrorArray);
+    loadTables(abortControllerTable.signal).then(setTables).catch(setErrorArray);
     return () => {
       abortControllerReservation.abort();
       abortControllerTable.abort();
-      setTablesError([]);
-      setReservationsError(null);
     };
   }
   const finishHandler = async (table_id) => {
@@ -47,7 +42,7 @@ function Dashboard({ date, cancelHandler }) {
             history.push('/tables');
           }
         })
-        .catch(setTablesError);
+        .catch(setErrorArray);
     }
   };
 
@@ -57,12 +52,15 @@ function Dashboard({ date, cancelHandler }) {
         <h1 className='m-1'>Dashboard</h1>
         <h4 className=''>Reservations for {date}</h4>
       </div>
-      <ErrorAlertDisplay errors={tablesError} />
-      <ErrorAlert error={reservationsError} />
-      <div className='col-4'>
-        <ReservationDisplay cancelHandler={cancelHandler} reservations={reservations} />
+      <ErrorAlertDisplay errors={errorArray} />
+      <div className='col-6'>
+        <ReservationDisplay
+          showWhenFinished={false}
+          cancelHandler={cancelHandler}
+          reservations={reservations}
+        />
       </div>
-      <div className='col-4'>
+      <div className='col-6'>
         <TableDisplay finishHandler={finishHandler} tables={tables} />
       </div>
       <div className='text-center'>

@@ -3,7 +3,7 @@ import ReservationDisplay from '../layout/subComponents/ReservationDisplay';
 import { search } from './search.service';
 import ErrorAlert from '../layout/subComponents/ErrorAlert';
 import _ from 'underscore';
-const SearchHomepage = ({cancelHandler}) => {
+const SearchHomepage = ({ cancelHandler }) => {
   const [reservationSearch, setReservationSearch] = useState([]);
   const [error, setError] = useState({});
   let reservationSearchCondition = _.isEmpty(reservationSearch);
@@ -13,9 +13,9 @@ const SearchHomepage = ({cancelHandler}) => {
     const formData = new FormData(e.target);
     let mb = formData.get('mobile_number');
     await search(mb, abort.signal).then(setReservationSearch).catch(setError);
-    return()=>{
+    return () => {
       abort.abort();
-    }
+    };
   };
   return (
     <main className='text-center bg-transparent m-2'>
@@ -45,7 +45,11 @@ const SearchHomepage = ({cancelHandler}) => {
         </div>
         <div className='col-6'>
           {!reservationSearchCondition ? (
-            <ReservationDisplay cancelHandler={cancelHandler} reservations={reservationSearch} />
+            <ReservationDisplay
+              showWhenFinished={true}
+              cancelHandler={cancelHandler}
+              reservations={reservationSearch}
+            />
           ) : (
             `No reservations found`
           )}

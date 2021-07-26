@@ -2,7 +2,7 @@ import React from 'react';
 import ReservationItem from './ReservationItem';
 import _ from 'underscore';
 
-const ReservationDisplay = ({ reservations, cancelHandler }) => {
+const ReservationDisplay = ({ reservations, cancelHandler, showWhenFinished = false }) => {
   const ifDataEmpty = _.isEmpty(reservations);
   const reservationDisplayClasses = 'row m-1 gx-0';
 
@@ -15,6 +15,7 @@ const ReservationDisplay = ({ reservations, cancelHandler }) => {
             res={res}
             index={res.reservation_id}
             cancelHandler={cancelHandler}
+            showWhenFinished={showWhenFinished}
           />
         ))}
       </div>
@@ -26,6 +27,7 @@ const ReservationDisplay = ({ reservations, cancelHandler }) => {
           res={reservations}
           index={reservations.reservation_id}
           cancelHandler={cancelHandler}
+          showWhenFinished={showWhenFinished}
         />
       </div>
     );

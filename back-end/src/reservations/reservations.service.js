@@ -1,5 +1,5 @@
 const Knex = require('../db/connection');
-const asyncErrorHandler = require('../errors/asyncErrorHandler');
+
 
 const tableName = 'reservations';
 
@@ -35,11 +35,17 @@ function updateStatus(reservation_id, newStatus) {
     .where('reservation_id', reservation_id)
     .update('status', newStatus, ['status']);
 }
+function update(reservation_id, updatedReservation) {
+  return Knex(tableName)
+    .where('reservation_id', reservation_id)
+    .update({...updatedReservation}, '*');
+}
 module.exports = {
   create,
   list,
   listByDate,
   read,
   search,
+  update,
   updateStatus,
 };

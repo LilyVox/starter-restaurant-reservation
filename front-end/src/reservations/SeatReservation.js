@@ -13,7 +13,7 @@ const SeatReservation = () => {
   const history = useHistory();
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState([]);
-  const [tableIdValue, setTableIdValue] = useState();
+  let tableIdValue = 0;
 
   useEffect(() => {
     const abort = new AbortController();
@@ -40,7 +40,7 @@ const SeatReservation = () => {
     } else setError({ error: `Please select an option below.` });
   };
   const selectHandler = (e) => {
-    setTableIdValue(e.target.value);
+    tableIdValue = e.target.value;
   };
   function TableOptionDisplay() {
     if (Array.isArray(tables)) {
@@ -53,7 +53,7 @@ const SeatReservation = () => {
         <select
           name='table_id'
           className='form-select'
-          value={tableIdValue}
+          defaultValue={tableIdValue}
           onSubmit={seatHandler}
           onChange={selectHandler}>
           {tableOptions}

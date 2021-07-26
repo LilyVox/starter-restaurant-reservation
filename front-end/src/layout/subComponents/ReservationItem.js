@@ -1,6 +1,12 @@
 import React from 'react';
 
-const ReservationItem = ({ res, index, suppressSeat = null, cancelHandler = null }) => {
+const ReservationItem = ({
+  res,
+  index,
+  suppressSeat = null,
+  cancelHandler = null,
+  showWhenFinished,
+}) => {
   const SeatDisplay = () => {
     return (
       <a className='btn btn-success' href={`/reservations/${res.reservation_id}/seat`}>
@@ -16,7 +22,7 @@ const ReservationItem = ({ res, index, suppressSeat = null, cancelHandler = null
     );
   };
   const CancelDisplay = () => {
-    if(cancelHandler === null) return null;
+    if (cancelHandler === null) return null;
     return (
       <button
         className='btn btn-primary'
@@ -26,8 +32,9 @@ const ReservationItem = ({ res, index, suppressSeat = null, cancelHandler = null
       </button>
     );
   };
-  let condition = res.status !== 'finished';
-  let seatCondition = suppressSeat ? false : res.status !== 'seated';
+  let isFinished = res.status === 'finished';
+  let condition = !showWhenFinished || isFinished || showWhenFinished;
+  let seatCondition = suppressSeat ? false : res.status === 'booked';
   return (
     condition && (
       <div
@@ -43,11 +50,11 @@ const ReservationItem = ({ res, index, suppressSeat = null, cancelHandler = null
           className='card-body'
           data-reservation-id-status={res.reservation_id}>{`${res.status}`}</div>
         <div className='card-footer'>
-          <CancelDisplay />
+          {!isFinished && <CancelDisplay />}
           {` ${res.reservation_time} `}
           <EditDisplay />
         </div>
-        {seatCondition && <SeatDisplay />}
+        {!isFinished && seatCondition && <SeatDisplay />}
       </div>
     )
   );

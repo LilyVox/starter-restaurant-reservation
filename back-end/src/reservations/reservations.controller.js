@@ -1,6 +1,7 @@
 const service = require('./reservations.service');
 const asyncErrorHandler = require('../errors/asyncErrorHandler');
 const _ = require('underscore');
+const validStatuses = ['finished', 'booked', 'seated', 'cancelled'];
 
 function verifyDateFormat(req, res, next) {
   if (req.query?.date) {
@@ -29,6 +30,18 @@ function verifyDate(req, res, next) {
     `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
   );
   const today = new Date();
+  if(!reservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)){
+    return next({
+      status: 400,
+      message: "'reservation_date' is not a valid date",
+    });
+  }
+  if(!reservation.reservation_time.match(/\d{2}:\d{2}/)){
+    return next({
+      status: 400,
+      message: "'reservation_time' is not a valid time",
+    });
+  }
 
   if (reservationDate.getDay() === 2) {
     return next({
@@ -88,16 +101,9 @@ function verifyCapturedData(req, res, next) {
     'reservation_date',
   ];
   for (let field of neededFields) {
-    if (!data.hasOwnProperty(field) || data[field] === '') {
+    if (!data.hasOwnProperty(field) || _.isEmpty(data[field])) {
       return next({ status: 400, message: `Field required: ${field}` });
     }
-  }
-  let testDate = Date.parse(`${data.reservation_date} ${data.reservation_time}`);
-  if (Number.isNaN(testDate)) {
-    return next({
-      status: 400,
-      message: 'reservation_date or reservation_time field is in an incorrect format',
-    });
   }
   if (typeof data.people !== 'number')
     return next({ status: 400, message: 'people field must be a number' });
@@ -131,7 +137,7 @@ function preUpdateStatus(req, res, next) {
   }
   if (status === 'finished')
     return next({ status: 400, message: 'cannot modify a finished order' });
-  if (!['finished', 'booked', 'seated'].includes(data.status))
+  if (!validStatuses.includes(data.status))
     return next({ status: 400, message: `Unknown or invalid status: ${data.status}` });
   res.locals.status = data.status;
   return next();
@@ -178,6 +184,13 @@ async function updateStatus(req, res) {
   let data = await service.updateStatus(res.locals.reservation_id, res.locals.status);
   res.status(200).json({ data: data[0] });
 }
+async function update(req, res) {
+  if (res.locals.reservation.hasOwnProperty('status') && res.locals.reservation.status !== 'booked') {
+    return next({ status: 400, message: "Only reservations with status 'booked' can be edited" });
+  }
+  let data = await service.update(res.locals.reservation_id, res.locals.reservation);
+  res.status(200).json({ data: data[0] });
+}
 async function search(req, res) {
   let data = await service.search(res.locals.mobileNumber);
   if (_.isEmpty(data)) {
@@ -195,6 +208,12 @@ module.exports = {
   ],
   create: [verifyCapturedData, verifyDate, asyncErrorHandler(createReservation)],
   read: [asyncErrorHandler(isValidID), read],
+  update: [
+    asyncErrorHandler(isValidID),
+    asyncErrorHandler(verifyCapturedData),
+    asyncErrorHandler(verifyDate),
+    asyncErrorHandler(update),
+  ],
   isValidID: [asyncErrorHandler(isValidID)],
   statusUpdate: [asyncErrorHandler(isValidID), preUpdateStatus, asyncErrorHandler(updateStatus)],
 };

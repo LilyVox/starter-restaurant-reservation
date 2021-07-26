@@ -34,4 +34,14 @@ export async function updateReservationStatus(reservation_id, status){
   };
   return await fetch(`${API_BASE_URL}/reservations/${reservation_id}/status`, request);
 }
+export async function updateExistingReservation(reservation_id, reservation){
+  let data = reservation;
+  let body = JSON.stringify({ data });
+  const request = {
+    method: 'PUT',
+    headers,
+    body,
+  };
+  return await fetch(`${API_BASE_URL}/reservations/${reservation_id}`, request);
+}
 export default sendNewReservation;
