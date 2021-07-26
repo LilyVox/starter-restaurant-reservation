@@ -9,8 +9,6 @@
 /coverage
 /test-report
 
-# production
-/build
 
 # misc
 .DS_Store

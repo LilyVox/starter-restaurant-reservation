@@ -9,7 +9,6 @@
   },
   "scripts": {
     "build": "npm -prefix front-end run build",
-    "predeploy": "git add . && git commit",
     "deploy": "git push origin main && git push owrfront main && git push owrback main",
     "commit": "git add . && git commit",
     "postcommit": "git push origin development",
