@@ -36,10 +36,15 @@ function Dashboard({ date, cancelHandler }) {
 
   const finishHandler = (table_id, e) => {
     if (window.confirm('Is this table ready to seat new guests?')) {
+      const abortControllerReservation = new AbortController();
+      const abortControllerTable = new AbortController();
       unseatTable(table_id)
         .then((response) => {
           if (response.ok) {
-            loadTables().then(setTables)
+            listReservations({ date }, abortControllerReservation.signal)
+              .then(setReservations)
+              .catch(setErrorArray);
+            loadTables(abortControllerTable.signal).then(setTables).catch(setErrorArray);
           } else setErrorArray([...errorArray, { error: 'did not "ok"' }]);
         })
         .catch(setErrorArray);

@@ -39,7 +39,7 @@ export async function loadTables(signal) {
     headers,
     signal,
   };
-  return await fetch(`${API_BASE_URL}/tables/`, request)
+  return await fetch(`${API_BASE_URL}/tables`, request)
     .then((response) => response.json())
     .then((response) => response.data);
 }

@@ -35,7 +35,7 @@ function ReservationMain() {
         .then((data) => {
           setReservation({ ...data, reservation_date: data.reservation_date.slice(0, 10) });
         })
-        .catch(e=>setErrorState([e.message]));
+        .catch((e) => setErrorState([e.message]));
       return () => {
         abort.abort();
         setErrorState([]);
@@ -57,11 +57,8 @@ function ReservationMain() {
       };
       if (areWeEditing) {
         await updateExistingReservation(reservation_id, updatedReservation)
-          .then((response) => {
-            if (response.ok) {
-              history.push(`/dashboard?date=${formatDate(reservation.reservation_date)}`);
-              return response.json();
-            }
+          .then(() => {
+            history.push(`/dashboard?date=${updatedReservation.reservation_date}`);
           })
           .catch((e) => localErrors.push(e));
       } else {
@@ -111,7 +108,7 @@ function ReservationMain() {
         "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)"
       );
     }
-    setErrorState([...localErrors])
+    setErrorState([...localErrors]);
     return localErrors;
   }
   const changeHandler = ({ target }) => {
@@ -128,6 +125,7 @@ function ReservationMain() {
   function formatPhoneNum(phoneNum) {
     if (phoneNum.match(/[0-9]{3}-[0-9]{3}-[0-9]{4}/)) return phoneNum;
     if (phoneNum.match(/\d{9}/)) return phoneNum.replace(/(\d{3})-?(\d{3})-?(\d{4})/, '$1-$2-$3');
+    return phoneNum;
   }
   function formatDate(reservation_date) {
     if (reservation_date.match(/\d{4}-\d{2}-\d{2}/)) return reservation_date;
