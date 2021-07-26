@@ -18,10 +18,12 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "underscore": "^1.13.1",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "build": "react-scripts build",
+    "commit": "git add . && git commit",
     "eject": "react-scripts eject",
     "start": "react-scripts start",
     "test": "npx cross-env CI=true npm run test:run",
