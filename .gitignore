@@ -19,6 +19,7 @@ coverage/
 .vscode/
 .vercel
 .screenshots/
+react-ui/
 
 npm-debug.log*
 yarn-debug.log*
